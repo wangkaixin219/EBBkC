@@ -5,12 +5,16 @@ set(CMAKE_CXX_STANDARD 14)
 
 find_package(OpenMP)
 if(OPENMP_FOUND)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} -O3")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -O3")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS} -mavx -O3")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -mavx -O3")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 else(OPENMP_FOUND)
     message("ERROR: OpenMP could not be found.")
 endif(OPENMP_FOUND)
 
 
-add_executable(DESCol main.cpp def.h VBBkC.cpp VBBkC.h EBBkC.cpp EBBkC.h def.cpp)
+add_executable(BBkC main.cpp
+        def.cpp def.h
+        vertex_oriented.cpp vertex_oriented.h
+        edge_oriented.cpp edge_oriented.h
+        set_operation.cpp set_operation.h)

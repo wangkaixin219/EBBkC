@@ -39,7 +39,7 @@ class HashMap_t {
     };
 
 private:
-    const size_t TAB_SIZE = 0x7fffffff;
+    const size_t TAB_SIZE = 0x7fffff;
     const size_t MAX_COLL = 100;
     int* table_size;
     HashItem_t** table;
