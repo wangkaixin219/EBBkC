@@ -1,6 +1,4 @@
-//
-// Created by kaixin on 3/25/23.
-//
+
 
 #ifndef DESCOL_VBBkC_H
 #define DESCOL_VBBkC_H
