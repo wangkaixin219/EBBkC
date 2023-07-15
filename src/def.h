@@ -1,6 +1,4 @@
-//
-// Created by Wang Kaixin on 2022/6/8.
-//
+
 
 #ifndef DESCOL_DEFS_H
 #define DESCOL_DEFS_H
