@@ -1,6 +1,4 @@
-//
-// Created by kaixin on 5/4/23.
-//
+
 
 #include "set_operation.h"
 constexpr int cyclic_shift1 = _MM_SHUFFLE(0,3,2,1); //rotating right
