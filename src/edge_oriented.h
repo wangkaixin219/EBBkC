@@ -1,6 +1,4 @@
-//
-// Created by kaixin on 3/25/23.
-//
+
 
 #ifndef DESCOL_EBBKC_H
 #define DESCOL_EBBKC_H
