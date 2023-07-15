@@ -1,6 +1,4 @@
-//
-// Created by kaixin on 5/4/23.
-//
+
 
 #ifndef DESCOL_SET_OPERATION_H
 #define DESCOL_SET_OPERATION_H
