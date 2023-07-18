@@ -15,6 +15,5 @@ endif(OPENMP_FOUND)
 
 add_executable(BBkC main.cpp
         def.cpp def.h
-        vertex_oriented.cpp vertex_oriented.h
         edge_oriented.cpp edge_oriented.h
         set_operation.cpp set_operation.h)

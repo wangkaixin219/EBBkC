@@ -1,5 +1,3 @@
-
-
 #ifndef DESCOL_EBBKC_H
 #define DESCOL_EBBKC_H
 #include "def.h"

@@ -1,6 +1,5 @@
-
-
 #include "set_operation.h"
+
 constexpr int cyclic_shift1 = _MM_SHUFFLE(0,3,2,1); //rotating right
 constexpr int cyclic_shift2 = _MM_SHUFFLE(2,1,0,3); //rotating left
 constexpr int cyclic_shift3 = _MM_SHUFFLE(1,0,3,2); //between
@@ -24,7 +23,7 @@ static const uint8_t shuffle_pi8_array[256] = {
         4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255, 255, 255, 255,
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
 };
-// static const ShuffleDict shuffle_mask_arr;
+
 static const __m128i *shuffle_mask = (__m128i*)(shuffle_pi8_array);
 
 int * prepare_byte_check_mask_dict()

@@ -1,5 +1,3 @@
-
-
 #ifndef DESCOL_SET_OPERATION_H
 #define DESCOL_SET_OPERATION_H
 

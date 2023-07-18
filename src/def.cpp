@@ -64,9 +64,8 @@ int HashMap_t::exist(const Edge_t &key) {
     return -1;
 }
 
-void HashMap_t::insert(const Edge_t &key, const int val) {
+void HashMap_t::insert(const Edge_t &key, int val) {
     size_t pos = h(key) % TAB_SIZE;
-    int i;
 
     if (table_size[pos] == 0)
         table[pos] = new HashMap_t::HashItem_t [MAX_COLL];
@@ -75,6 +74,26 @@ void HashMap_t::insert(const Edge_t &key, const int val) {
 
     table[pos][table_size[pos]].key = key;
     table[pos][table_size[pos]++].val = val;
+}
+
+void HashMap_t::remove(const Edge_t &key) {
+    size_t pos = h(key) % TAB_SIZE;
+    int i;
+    Edge_t e;
+
+    if (table_size[pos] > 0) {
+        for (i = 0; i < table_size[pos]; i++) {
+            e = table[pos][i].key;
+            if ((e.s == key.s && e.t == key.t) || (e.s == key.t && e.t == key.s)) {
+                table[pos][i] = table[pos][--table_size[pos]];
+                if (table_size[pos] == 0) delete [] table[pos];
+                break;
+            }
+        }
+        return;
+    }
+
+    exit(-1);
 }
 
 KeyVal_t::KeyVal_t() = default;
@@ -217,8 +236,3 @@ double GetTime(struct rusage* start, struct rusage* end) {
            ((float)(end->ru_utime.tv_usec - start->ru_utime.tv_usec)) * 1e-3;
 }   // unit: ms
 
-//template <class T>
-//void hash_combine(std::size_t& seed, const T& v) {
-//    std::hash<T> H;
-//    seed ^= H(v) + 0x9e3779b9 + (seed<<6) + (seed>>2);
-//}

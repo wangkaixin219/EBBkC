@@ -14,21 +14,29 @@ EBBkC_Graph_t::~EBBkC_Graph_t() {
 
     delete [] edges;
 
-    for (i = 0; i < e_size; i++) delete [] T[i];
-    delete [] T;
+    if (T) {
+        for (i = 0; i < e_size; i++) delete [] T[i];
+        delete [] T;
+    }
 
-    for (i = 0; i < e_size; i++) delete [] C[i];
-    delete [] C;
+    if (C) {
+        for (i = 0; i < e_size; i++) delete [] C[i];
+        delete [] C;
+    }
 
     delete [] T_size;
 
     delete [] C_size;
 
-    for (i = 0; i <= K; i++) delete [] sub_v[i];
-    delete [] sub_v;
+    if (sub_v) {
+        for (i = 0; i <= K; i++) delete [] sub_v[i];
+        delete [] sub_v;
+    }
 
-    for (i = 0; i <= K; i++) delete [] sub_e[i];
-    delete [] sub_e;
+    if (sub_e) {
+        for (i = 0; i <= K; i++) delete [] sub_e[i];
+        delete [] sub_e;
+    }
 
     delete [] sub_v_size;
 
@@ -36,32 +44,49 @@ EBBkC_Graph_t::~EBBkC_Graph_t() {
 
     delete [] lab;
 
-    for (i = 0; i <= K; i++) delete [] DAG_deg[i];
-    delete [] DAG_deg;
+    if (DAG_deg) {
+        for (i = 0; i <= K; i++) delete [] DAG_deg[i];
+        delete [] DAG_deg;
 
-    for (i = 0; i <= K; i++) delete [] G_deg[i];
-    delete [] G_deg;
+    }
+
+    if (G_deg) {
+        for (i = 0; i <= K; i++) delete [] G_deg[i];
+        delete [] G_deg;
+    }
+
 
     delete [] col;
 
-    for (i = 0; i < v_size; i++) delete [] DAG_adj[i];
-    delete [] DAG_adj;
+    if (DAG_adj) {
+        for (i = 0; i < v_size; i++) delete [] DAG_adj[i];
+        delete [] DAG_adj;
+    }
 
-    for (i = 0; i < v_size; i++) delete [] G_adj[i];
-    delete [] G_adj;
+    if (G_adj) {
+        for (i = 0; i < v_size; i++) delete [] G_adj[i];
+        delete [] G_adj;
+    }
 
-    for (i = 0; i <= K; i++) delete [] used[i];
-    delete [] used;
+    if (used) {
+        for (i = 0; i <= K; i++) delete [] used[i];
+        delete [] used;
+    }
+
 
     delete [] v_lab;
 
     delete [] e_lab;
 
-    for (i = 0; i <= K; i++) delete [] out_v_size[i];
-    delete [] out_v_size;
+    if (out_v_size) {
+        for (i = 0; i <= K; i++) delete [] out_v_size[i];
+        delete [] out_v_size;
+    }
 
-    for (i = 0; i <= K; i++) delete [] out_e_size[i];
-    delete [] out_e_size;
+    if (out_e_size) {
+        for (i = 0; i <= K; i++) delete [] out_e_size[i];
+        delete [] out_e_size;
+    }
 
     delete [] F;
 
@@ -69,8 +94,10 @@ EBBkC_Graph_t::~EBBkC_Graph_t() {
 
     delete [] lack_size;
 
-    for (i = 0; i < v_size; i++) delete [] lack[i];
-    delete [] lack;
+    if (lack) {
+        for (i = 0; i < v_size; i++) delete [] lack[i];
+        delete [] lack;
+    }
 
     delete [] lev;
 
@@ -209,7 +236,7 @@ void EBBkC_Graph_t::read_ordered_edges_from_file(const char *file_name) {
 
 void EBBkC_Graph_t::truss_decompose(const char* w_file_name) {
 
-    int i, j, k, s, t, w, end, edge_seq = 1;
+    int i, j, k, s, t, w, end, edge_seq = 1, sw, wt;
 
     auto *_d = new int [v_size]();
     auto *_cd = new int [v_size + 1];
@@ -236,6 +263,7 @@ void EBBkC_Graph_t::truss_decompose(const char* w_file_name) {
     auto *sup = new int [e_size]();
     auto *h_table = new bool [v_size]();
     unordered_map<Edge_t, int, Edge_t::Hash_Edge_t> edge_id;
+
     unordered_map<Edge_t, int, Edge_t::Hash_Edge_t> edge_truss;
     unordered_map<Edge_t, int, Edge_t::Hash_Edge_t> edge_rank;
     unordered_map<Edge_t, vector<int>, Edge_t::Hash_Edge_t> edge_sub;
@@ -440,126 +468,27 @@ void EBBkC_Graph_t::EBBkC(int l, unsigned long long *cliques) {
 
                 if (T_size[e] < l - 2 || C_size[e] < (l - 2) * (l - 3) / 2) continue;
 
-
                 sub_v_size[l - 2] = 0;
 
                 for (j = 0; j < T_size[e]; j++) {
                     u = T[e][j];
                     sub_v[l - 2][sub_v_size[l - 2]++] = u;
-//                    v_lab[u] = l - 2;
                 }
-
 
                 sub_e_size[l - 2] = 0;
 
                 for (j = 0; j < C_size[e]; j++) {
                     e_ = C[e][j];
                     sub_e[l - 2][sub_e_size[l - 2]++] = e_;
-//                    e_lab[e_] = l - 2;
                 }
-
-
-//                sub_e_size[l - 2] = 0;
-
-//                sort(C[e], C[e] + C_size[e]);
-
-//                for (j = 0; j < C_size[e]; j++) {
-//                    e_ = C[e][j];
-//                    sub_e[l - 2][sub_e_size[l - 2]++] = e_;
-//                    e_lab[e_] = l - 2;
-//                }
-
-//                sort(sub_e[l - 2], sub_e[l - 2] + sub_e_size[l - 2]);
-
-
-//                sort(T[e], T[e] + T_size[e]);
-
-//                for (j = 0; j < T_size[e]; j++) {
-//                    u = T[e][j];
-//                    sub_v[l - 2][sub_v_size[l - 2]++] = u;
-//                    v_lab[u] = l - 2;
-//                }
-
-//                sort(sub_v[l - 2], sub_v[l - 2] + sub_v_size[l - 2]);
-
-//                for (j = 0; j < sub_e_size[l - 2]; j++) {
-//                    e_ = sub_e[l - 2][j];
-//                    out_e_size[l - 2][e_] = 0;
-//
-//                    end = C_size[e_];
-//                    for (k = 0; k < end; k++) {
-//                        _e = C[e_][k];
-//
-//                        if (e_lab[_e] == l - 2) {
-//                            out_e_size[l - 2][e_]++;
-//                        }
-//                        else {
-//                            C[e_][k--] = C[e_][--end];
-//                            C[e_][end] = _e;
-//                        }
-//                    }
-//
-//                    out_v_size[l - 2][e_] = 0;
-//
-//                    end = T_size[e_];
-//                    for (k = 0; k < end; k++) {
-//                        u = T[e_][k];
-//                        if (v_lab[u] == l - 2) {
-//                            out_v_size[l - 2][e_]++;
-//                        }
-//                        else {
-//                            T[e_][k--] = T[e_][--end];
-//                            T[e_][end] = u;
-//                        }
-//                    }
-//                }
 
                 EBBkC(l - 2, cliques);
 
-//                for (j = 0; j < C_size[e]; j++) {
-//                    e_ = C[e][j];
-//                    e_lab[e_] = l;
-//                }
-//
-//                for (j = 0; j < T_size[e]; j++) {
-//                    u = T[e][j];
-//                    v_lab[u] = l;
-//                }
             }
         }
 
         return;
     }
-
-//    if (l == 2) {
-//        for (i = 0; i < sub_e_size[l]; i++) {
-//            (*cliques)++;
-//        }
-//
-//        return;
-//    }
-//
-//    if (l == 3) {
-//        for (i = 0; i < sub_e_size[l]; i++) {
-//            e = sub_e[l][i];
-//
-//            for (j = 0; j < out_v_size[l][e]; j++) {
-//                u = T[e][j];
-//                v_lab[u] = l - 2;
-//            }
-//
-//            for (j = 0; j < sub_v_size[l]; j++) {
-//                u = sub_v[l][j];
-//                if (v_lab[u] == l - 2) (*cliques)++;
-//            }
-//
-//            for (j = 0; j < out_v_size[l][e]; j++) {
-//                u = T[e][j];
-//                v_lab[u] = l;
-//            }
-//        }
-//        return;
-//    }
 
     for (i = 0; i < sub_e_size[l]; i++) {
         e = sub_e[l][i];
@@ -583,68 +512,6 @@ void EBBkC_Graph_t::EBBkC(int l, unsigned long long *cliques) {
             sub_e_size[l - 2] = intersect_simd4x(sub_e[l], sub_e_size[l], C[e], C_size[e], sub_e[l - 2]);
             EBBkC(l - 2, cliques);
         }
-
-//        if (out_v_size[l][e] < l - 2 || out_e_size[l][e] < (l - 2) * (l - 3) / 2) continue;
-//
-//        sub_v_size[l - 2] = 0;
-//        sub_e_size[l - 2] = 0;
-//
-//        for (j = 0; j < out_e_size[l][e]; j++) {
-//            e_ = C[e][j];
-//            sub_e[l - 2][sub_e_size[l - 2]++] = e_;
-//            e_lab[e_] = l - 2;
-//        }
-//
-//        for (j = 0; j < out_v_size[l][e]; j++) {
-//            u = T[e][j];
-//            sub_v[l - 2][sub_v_size[l - 2]++] = u;
-//            v_lab[u] = l - 2;
-//        }
-//
-//        for (j = 0; j < sub_e_size[l - 2]; j++) {
-//            e_ = sub_e[l - 2][j];
-//            out_e_size[l - 2][e_] = 0;
-//
-//            end = out_e_size[l][e_];
-//            for (k = 0; k < end; k++) {
-//                _e = C[e_][k];
-//
-//                if (e_lab[_e] == l - 2) {
-//                    out_e_size[l - 2][e_]++;
-//                }
-//                else {
-//                    C[e_][k--] = C[e_][--end];
-//                    C[e_][end] = _e;
-//                }
-//            }
-//
-//            out_v_size[l - 2][e_] = 0;
-//
-//            end = out_v_size[l][e_];
-//            for (k = 0; k < end; k++) {
-//                u = T[e_][k];
-//
-//                if (v_lab[u] == l - 2) {
-//                    out_v_size[l - 2][e_]++;
-//                }
-//                else {
-//                    T[e_][k--] = T[e_][--end];
-//                    T[e_][end] = u;
-//                }
-//            }
-//        }
-//
-//        EBBkC(l - 2, cliques);
-//
-//        for (j = 0; j < out_e_size[l][e]; j++) {
-//            e_ = C[e][j];
-//            e_lab[e_] = l;
-//        }
-//
-//        for (j = 0; j < out_v_size[l][e]; j++) {
-//            u = T[e][j];
-//            v_lab[u] = l;
-//        }
     }
 }
 
@@ -785,124 +652,12 @@ void EBBkC_Graph_t::EBBkC_plus(int l, unsigned long long *cliques) {
             }
         }
 
-//        else {
-//            if (sub_v_size[l - 1] >= l - 1) {
-//
-//                for (j = 0; j < sub_v_size[l - 1]; j++) {
-//                    v = sub_v[l - 1][j];
-//
-//                    if (col[v] < l - 1) continue;
-//
-//                    sub_v_size[l - 2] = intersect_simd4x(sub_v[l - 1], sub_v_size[l - 1], DAG_adj[v], DAG_deg[0][v], sub_v[l - 2]);
-//
-//                    if (sub_v_size[l - 2] >= l - 2) {
-//                        EBBkC_plus(l - 2, cliques);
-//                    }
-//                }
-//            }
-//        }
-
         else {
             if (sub_v_size[l - 1] >= l - 1) {
                 EBBkC_plus(l - 1, cliques);
             }
         }
     }
-
-
-
-//    if (l == 2) {
-//        for (i = 0; i < sub_v_size[l]; i++) {
-//            u = sub_v[l][i];
-//
-//            for (j = 0; j < DAG_deg[l][u]; j++) {
-//                (*cliques)++;
-//            }
-//        }
-//        return;
-//    }
-//
-//    if (l == 3) {
-//
-//        for (i = 0; i < sub_v_size[l]; i++) {
-//            u = sub_v[l][i];
-//
-//            if (col[u] < l) continue;
-//
-//            for (j = 0; j < DAG_deg[l][u]; j++) {
-//                v = DAG_adj[u][j];
-//                lab[v] = l - 1;
-//            }
-//
-//            for (j = 0; j < DAG_deg[l][u]; j++) {
-//                v = DAG_adj[u][j];
-//
-//                if (col[v] < l - 1) continue;
-//
-//                for (k = 0; k < DAG_deg[l][v]; k++) {
-//                    w = DAG_adj[v][k];
-//                    if (lab[w] == l - 1) (*cliques)++;
-//                }
-//            }
-//
-//            for (j = 0; j < DAG_deg[l][u]; j++) {
-//                v = DAG_adj[u][j];
-//                lab[v] = l;
-//            }
-//        }
-//
-//        return;
-//    }
-//
-//    for (i = 0; i < sub_v_size[l]; i++) {
-//        u = sub_v[l][i];
-//
-//        if (col[u] < l) continue;
-//
-//        sub_v_size[l - 1] = 0;
-//        dist = 0;
-//
-//        for (j = 0; j < DAG_deg[l][u]; j++) {
-//            v = DAG_adj[u][j];
-//            lab[v] = l - 1;
-//            sub_v[l - 1][sub_v_size[l - 1]++] = v;
-//            DAG_deg[l - 1][v] = 0;
-//
-//            if (!used[l][col[v]]) {
-//                used[l][col[v]] = true;
-//                dist++;
-//            }
-//        }
-//
-//        if (dist >= l - 1) {
-//
-//            sub_e_size[l - 1] = 0;
-//            for (j = 0; j < sub_v_size[l - 1]; j++) {
-//                v = sub_v[l - 1][j];
-//
-//                end = DAG_deg[l][v];
-//                for (k = 0; k < end; k++) {
-//                    w = DAG_adj[v][k];
-//                    if (lab[w] == l - 1) {
-//                        DAG_deg[l - 1][v]++;
-//                        sub_e_size[l - 1]++;
-//                        // for efficiency issues, we don't save in sub_e[l]
-//                    } else {
-//                        DAG_adj[v][k--] = DAG_adj[v][--end];
-//                        DAG_adj[v][end] = w;
-//                    }
-//                }
-//            }
-//
-//            EBBkC_plus(l - 1, cliques);
-//        }
-//
-//        for (j = 0; j < sub_v_size[l - 1]; j++) {
-//            v = sub_v[l - 1][j];
-//            lab[v] = l;
-//            used[l][col[v]] = false;
-//        }
-//    }
 }
 
 
@@ -1129,6 +884,8 @@ void EBBkC_Comb_list(int *list, int list_size, int start, int picked, int k, uns
 }
 
 void EBBkC_Graph_t::list_in_plex(int start, int p, int q, unsigned long long *cliques) {
+    if (F_size < q) return;
+
     if (p == 0) {
         if (q > F_size - q)
             EBBkC_Comb_list(F, F_size, 0, 0, F_size - q, cliques);
@@ -1139,7 +896,7 @@ void EBBkC_Graph_t::list_in_plex(int start, int p, int q, unsigned long long *cl
 
     int i, j, u, v, vis = 0;
 
-    for (i = start; i < P_size && (P_act >= p && F_size >= q); i++) {
+    for (i = start; i < P_size && P_act >= p; i++) {
         u = P[i];
 
         if (lev[u]) continue;
@@ -1174,14 +931,22 @@ bool EBBkC_Graph_t::can_terminate(int l, unsigned long long *cliques) {
     if (sub_e_size[l] < sub_v_size[l] * (sub_v_size[l] - L) / 2) return false;
 
     if (sub_e_size[l] == sub_v_size[l] * (sub_v_size[l] - 1) / 2) {
-        EBBkC_Comb_list(sub_v[l], sub_v_size[l], 0, 0, min(l, sub_v_size[l] - l), cliques);
+        if (l > sub_v_size[l] - l)
+            EBBkC_Comb_list(sub_v[l], sub_v_size[l], 0, 0, sub_v_size[l] - l, cliques);
+        else
+            EBBkC_Comb_list(sub_v[l], sub_v_size[l], 0, 0, l, cliques);
+
         return true;
     }
+
+    if (L == 1) return false;
 
     for (i = 0; i < sub_v_size[l]; i++) {
         u = sub_v[l][i];
 
-        if (sub_v_size[l] - G_deg[l][u] > L) return false;
+        if (sub_v_size[l] - G_deg[l][u] > L) {
+            return false;
+        }
     }
 
     F_size = 0;
