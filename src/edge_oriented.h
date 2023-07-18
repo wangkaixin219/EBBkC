@@ -74,7 +74,7 @@ public:
 class EBBkC_t {
 public:
     static double truss_order(const char* r_file_name, const char* w_file_name);
-    static double list_k_clique(const char* file_name, int type);
+    static double list_k_clique(const char* file_name);
 };
 
 

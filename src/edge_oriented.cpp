@@ -1015,7 +1015,7 @@ double EBBkC_t::truss_order(const char *r_file_name, const char *w_file_name) {
     return runtime;
 }
 
-double EBBkC_t::list_k_clique(const char *file_name, int type) {
+double EBBkC_t::list_k_clique(const char *file_name) {
     double runtime;
     struct rusage start, end;
     EBBkC_Graph_t G;
@@ -1027,27 +1027,11 @@ double EBBkC_t::list_k_clique(const char *file_name, int type) {
     G.build_from_G();
 
     printf("Iterate over all cliques\n");
-    if (type == 0) {
-        GetCurTime(&start);
-        G.EBBkC(K, &N);
-        GetCurTime(&end);
-        runtime = GetTime(&start, &end);
-    }
-    else if (type == 1) {
-        GetCurTime(&start);
-        G.EBBkC_plus(K, &N);
-        GetCurTime(&end);
-        runtime = GetTime(&start, &end);
-    }
-    else if (type == 2) {
-        GetCurTime(&start);
-        G.EBBkC_plus_plus(K, &N);
-        GetCurTime(&end);
-        runtime = GetTime(&start, &end);
-    }
-    else {
-        runtime = 0;
-    }
+
+    GetCurTime(&start);
+    G.EBBkC_plus_plus(K, &N);
+    GetCurTime(&end);
+    runtime = GetTime(&start, &end);
 
     return runtime;
 }

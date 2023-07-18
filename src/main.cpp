@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
         printf("Pre-processed in %.2lf ms\n\n", runtime);
     }
 
-    else if (act == "e") {                      // serial
+    else if (act == "e") {                      // EBBkC+ET
         string src_filename(argv[2]);
         string suffix = src_filename.substr(src_filename.find_last_of('.'));
         if (suffix != ".index") exit(0);
@@ -42,22 +42,9 @@ int main(int argc, char** argv) {
         K = atoi(argv[3]);
         L = atoi(argv[4]);
 
-        int type = atoi(argv[5]);
-
-        assert(type == 0 || type == 1 || type == 2);
-
-        runtime = EBBkC_t::list_k_clique(argv[2], type);
+        runtime = EBBkC_t::list_k_clique(argv[2]);
         printf("Number of %u-cliques: %llu\n", K, N);
-
-        if (type == 0) {
-            printf("EBBkC Runtime %.2lf ms\n\n", runtime);
-        }
-        else if (type == 1) {
-            printf("EBBkC+ Runtime %.2lf ms\n\n", runtime);
-        }
-        else {
-            printf("EBBkC++ (%d) Runtime %.2lf ms\n\n", L, runtime);
-        }
+        printf("EBBkC+ET (t = %d) runtime %.2lf ms\n\n", L, runtime);
     }
 
     else {
