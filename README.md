@@ -104,7 +104,7 @@ To list $k$-cliques in the graph with multiple threads, we need to specify an ad
 For example, 
 
 ```bash
-./BBkC e ../../dataset/facebook.index 12 3 16   # list 12-clique in `facebook` with early-termination in 3-plex with 16 threads
+./BBkC ep ../../dataset/nasasrb.index 12 3 16   # list 12-clique in `nasasrb` with early-termination in 3-plex with 16 threads
 ```
 
 It should outputs
