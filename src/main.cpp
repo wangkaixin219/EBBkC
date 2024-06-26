@@ -47,6 +47,21 @@ int main(int argc, char** argv) {
         printf("EBBkC+ET (t = %d) runtime %.2lf ms\n\n", L, runtime);
     }
 
+    else if (act == "ep") {                      // EBBkC+ET (parallel)
+        string src_filename(argv[2]);
+        string suffix = src_filename.substr(src_filename.find_last_of('.'));
+        if (suffix != ".index") exit(0);
+
+        K = atoi(argv[3]);
+        L = atoi(argv[4]);
+
+        omp_set_num_threads(atoi(argv[5]));
+
+        runtime = EBBkC_t::list_k_clique_parallel(argv[2]);
+        printf("Number of %u-cliques: %llu\n", K, N);
+        printf("EBBkC+ET (t = %d) runtime %.2lf ms\n\n", L, runtime);
+    }
+
     else {
         printf("Wrong usage.\n");
         exit(0);

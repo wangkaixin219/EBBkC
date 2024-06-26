@@ -12,6 +12,7 @@ public:
     int v_size = 0;
     int e_size = 0;
     int truss_num = 0;
+    bool is_sub = false;
     HashMap_t edge2id;
     Edge_t* edges = nullptr;
 
@@ -60,11 +61,14 @@ public:
     void read_edges_from_file(const char* file_name);
     void truss_decompose(const char* w_file_name);
     void read_ordered_edges_from_file(const char* file_name);
-    void build_from_G();
+    void build(bool sub);
 
     void EBBkC(int l, unsigned long long *cliques);
     void EBBkC_plus(int, unsigned long long *cliques);
     void EBBkC_plus_plus(int l, unsigned long long *cliques);
+
+    void branch(int e, EBBkC_Graph_t* g);
+    void EBBkC_plus_plus_parallel(int l, unsigned long long *cliques);
 
     bool can_terminate(int l, unsigned long long* cliques);
     void list_in_plex(int start, int p, int q, unsigned long long* cliques);
@@ -75,6 +79,7 @@ class EBBkC_t {
 public:
     static double truss_order(const char* r_file_name, const char* w_file_name);
     static double list_k_clique(const char* file_name);
+    static double list_k_clique_parallel(const char* file_name);
 };
 
 

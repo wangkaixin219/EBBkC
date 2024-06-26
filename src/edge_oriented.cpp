@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include "set_operation.h"
+#include <omp.h>
 
 extern const int K, L;
 extern unsigned long long N;
@@ -10,17 +11,23 @@ extern unsigned long long N;
 EBBkC_Graph_t::EBBkC_Graph_t() = default;
 
 EBBkC_Graph_t::~EBBkC_Graph_t() {
-    int i;
+    int i, k = K, node_size = v_size, link_size = e_size;
+
+    if (is_sub) {
+        k = K - 2;
+        node_size = truss_num;
+        link_size = truss_num * (truss_num - 1) / 2;
+    }
 
     delete [] edges;
 
     if (T) {
-        for (i = 0; i < e_size; i++) delete [] T[i];
+        for (i = 0; i < link_size; i++) delete [] T[i];
         delete [] T;
     }
 
     if (C) {
-        for (i = 0; i < e_size; i++) delete [] C[i];
+        for (i = 0; i < link_size; i++) delete [] C[i];
         delete [] C;
     }
 
@@ -29,12 +36,12 @@ EBBkC_Graph_t::~EBBkC_Graph_t() {
     delete [] C_size;
 
     if (sub_v) {
-        for (i = 0; i <= K; i++) delete [] sub_v[i];
+        for (i = 0; i <= k; i++) delete [] sub_v[i];
         delete [] sub_v;
     }
 
     if (sub_e) {
-        for (i = 0; i <= K; i++) delete [] sub_e[i];
+        for (i = 0; i <= k; i++) delete [] sub_e[i];
         delete [] sub_e;
     }
 
@@ -45,13 +52,13 @@ EBBkC_Graph_t::~EBBkC_Graph_t() {
     delete [] lab;
 
     if (DAG_deg) {
-        for (i = 0; i <= K; i++) delete [] DAG_deg[i];
+        for (i = 0; i <= k; i++) delete [] DAG_deg[i];
         delete [] DAG_deg;
 
     }
 
     if (G_deg) {
-        for (i = 0; i <= K; i++) delete [] G_deg[i];
+        for (i = 0; i <= k; i++) delete [] G_deg[i];
         delete [] G_deg;
     }
 
@@ -59,32 +66,30 @@ EBBkC_Graph_t::~EBBkC_Graph_t() {
     delete [] col;
 
     if (DAG_adj) {
-        for (i = 0; i < v_size; i++) delete [] DAG_adj[i];
+        for (i = 0; i < node_size; i++) delete [] DAG_adj[i];
         delete [] DAG_adj;
     }
 
     if (G_adj) {
-        for (i = 0; i < v_size; i++) delete [] G_adj[i];
+        for (i = 0; i < node_size; i++) delete [] G_adj[i];
         delete [] G_adj;
     }
 
     if (used) {
-        for (i = 0; i <= K; i++) delete [] used[i];
+        for (i = 0; i <= k; i++) delete [] used[i];
         delete [] used;
     }
 
 
     delete [] v_lab;
 
-    delete [] e_lab;
-
     if (out_v_size) {
-        for (i = 0; i <= K; i++) delete [] out_v_size[i];
+        for (i = 0; i <= k; i++) delete [] out_v_size[i];
         delete [] out_v_size;
     }
 
     if (out_e_size) {
-        for (i = 0; i <= K; i++) delete [] out_e_size[i];
+        for (i = 0; i <= k; i++) delete [] out_e_size[i];
         delete [] out_e_size;
     }
 
@@ -95,7 +100,7 @@ EBBkC_Graph_t::~EBBkC_Graph_t() {
     delete [] lack_size;
 
     if (lack) {
-        for (i = 0; i < v_size; i++) delete [] lack[i];
+        for (i = 0; i < node_size; i++) delete [] lack[i];
         delete [] lack;
     }
 
@@ -360,73 +365,76 @@ void EBBkC_Graph_t::truss_decompose(const char* w_file_name) {
 }
 
 
-void EBBkC_Graph_t::build_from_G() {
-    int i;
+void EBBkC_Graph_t::build(bool sub) {
+    int i, k = K, node_size = v_size, link_size = e_size;
 
-    sub_v = new int* [K + 1];
+    is_sub = sub;
 
-    sub_e = new int* [K + 1];
+    if (sub) {
+        k = K - 2;
+        node_size = truss_num;
+        link_size = (truss_num) * (truss_num - 1) / 2;
+    }
 
-    sub_e_size = new int [K + 1];
+    sub_v = new int* [k + 1];
 
-    sub_v_size = new int [K + 1];
+    sub_e = new int* [k + 1];
 
-    for (i = 0; i < K; i++) sub_v[i] = new int [truss_num + 1];
-    sub_v[K] = new int [v_size];
+    sub_e_size = new int [k + 1];
 
-    for (i = 0; i < K; i++) sub_e[i] = new int [truss_num * (truss_num - 1) / 2];
-    sub_e[K] = new int [e_size];
+    sub_v_size = new int [k + 1];
 
-    sub_v_size[K] = 0;
-    for (i = 0; i < v_size; i++) sub_v[K][sub_v_size[K]++] = i;
+    for (i = 0; i < k; i++) sub_v[i] = new int [truss_num + 1];
+    sub_v[k] = new int [node_size];
 
-    sub_e_size[K] = 0;
-    for (i = 0; i < e_size; i++) sub_e[K][sub_e_size[K]++] = i;
+    for (i = 0; i < k; i++) sub_e[i] = new int [truss_num * (truss_num - 1) / 2];
+    sub_e[k] = new int [link_size];
 
-    lab = new int [v_size];
-    for (i = 0; i < v_size; i++) lab[i] = K;
+    sub_v_size[k] = 0;
 
-    DAG_deg = new int* [K + 1];
-    for (i = 0; i <= K; i++) DAG_deg[i] = new int [v_size];
+    sub_e_size[k] = 0;
 
-    G_deg = new int* [K + 1];
-    for (i = 0; i <= K; i++) G_deg[i] = new int [v_size];
+    lab = new int [node_size];
+    for (i = 0; i < node_size; i++) lab[i] = k;
 
-    col = new int [v_size];
+    DAG_deg = new int* [k + 1];
+    for (i = 0; i <= k; i++) DAG_deg[i] = new int [node_size];
 
-    DAG_adj = new int* [v_size];
-    for (i = 0; i < v_size; i++) DAG_adj[i] = new int [truss_num + 1];
+    G_deg = new int* [k + 1];
+    for (i = 0; i <= k; i++) G_deg[i] = new int [node_size];
 
-    G_adj = new int* [v_size];
-    for (i = 0; i < v_size; i++) G_adj[i] = new int  [truss_num + 1];
+    col = new int [node_size];
 
-    used = new bool* [K + 1];
-    for (i = 0; i <= K; i++) used[i] = new bool [v_size + 1]();
+    DAG_adj = new int* [node_size];
+    for (i = 0; i < node_size; i++) DAG_adj[i] = new int [truss_num + 1];
 
-    v_lab = new int [v_size];
-    for (i = 0; i < v_size; i++) v_lab[i] = K;
+    G_adj = new int* [node_size];
+    for (i = 0; i < node_size; i++) G_adj[i] = new int  [truss_num + 1];
 
-    e_lab = new int [e_size];
-    for (i = 0; i < e_size; i++) e_lab[i] = K;
+    used = new bool* [k + 1];
+    for (i = 0; i <= k; i++) used[i] = new bool [node_size + 1]();
 
-    out_v_size = new int* [K + 1];
-    for (i = 0; i <= K; i++) out_v_size[i] = new int [e_size];
+    v_lab = new int [node_size];
+    for (i = 0; i < node_size; i++) v_lab[i] = k;
 
-    out_e_size = new int* [K + 1];
-    for (i = 0; i <= K; i++) out_e_size[i] = new int [e_size];
+    out_v_size = new int* [k + 1];
+    for (i = 0; i <= k; i++) out_v_size[i] = new int [link_size];
+
+    out_e_size = new int* [k + 1];
+    for (i = 0; i <= k; i++) out_e_size[i] = new int [link_size];
 
     F = new int [truss_num + 1];
 
     P = new int [truss_num + 1];
 
-    lack_size = new int [v_size];
+    lack_size = new int [node_size];
 
-    lack = new int* [v_size];
-    for (i = 0; i < v_size; i++) lack[i] = new int [L + 1];
+    lack = new int* [node_size];
+    for (i = 0; i < node_size; i++) lack[i] = new int [L + 1];
 
-    lev = new int [v_size]();
+    lev = new int [node_size]();
 
-    loc = new int [v_size];
+    loc = new int [node_size];
 }
 
 
@@ -664,9 +672,12 @@ void EBBkC_Graph_t::EBBkC_plus(int l, unsigned long long *cliques) {
 void EBBkC_Graph_t::EBBkC_plus_plus(int l, unsigned long long *cliques) {
     int c, i, j, k, p, e, e_, u, v, w, s, t, end, dist;
 
-    if (sub_v_size[l] < l || sub_e_size[l] < l * (l - 1) / 2) return;
-
     if (l == K) {
+
+        for (i = 0; i < v_size; i++) sub_v[K][sub_v_size[K]++] = i;
+
+        for (i = 0; i < e_size; i++) sub_e[K][sub_e_size[K]++] = i;
+
         if (K == 3) {
             for (i = 0; i < sub_e_size[l]; i++) {
                 e = sub_e[l][i];
@@ -766,6 +777,8 @@ void EBBkC_Graph_t::EBBkC_plus_plus(int l, unsigned long long *cliques) {
 
         return;
     }
+
+    if (sub_v_size[l] < l || sub_e_size[l] < l * (l - 1) / 2) return;
 
     if (l == 2) {
         for (i = 0; i < sub_v_size[l]; i++) {
@@ -871,6 +884,214 @@ void EBBkC_Graph_t::EBBkC_plus_plus(int l, unsigned long long *cliques) {
     }
 }
 
+void EBBkC_Graph_t::branch(int e, EBBkC_Graph_t* g) {
+    int c, i, j, k, p, e_, u, v, w, s, t, end, dist, l = K;
+    int *old2new = new int[v_size];
+
+    g->v_size = 0;
+    g->e_size = 0;
+    g->edges = new Edge_t[C_size[e] + 1];
+    g->new2old = vector<int>(T_size[e]);
+
+    for (i = 0; i < T_size[e]; i++) {
+        u = T[e][i];
+        old2new[u] = g->v_size;
+        g->new2old[g->v_size++] = u;
+    }
+
+    for (i = 0; i < C_size[e]; i++) {
+        e_ = C[e][i];
+        s = edges[e_].s;
+        t = edges[e_].t;
+        g->edges[g->e_size].s = old2new[s];
+        g->edges[g->e_size++].t = old2new[t];
+    }
+
+    delete [] old2new;
+
+    if (l == 3 || l == 4) return;
+
+    if (g->v_size < l - 2 || g->e_size < (l - 2) * (l - 3) / 2) {
+        g->sub_v_size[l - 2] = g->v_size;
+        g->sub_e_size[l - 2] = g->e_size;
+        return;
+    }
+
+    for (j = 0; j < g->v_size; j++) {
+        g->col[j] = 0;
+        g->DAG_deg[l - 2][j] = 0;
+        g->G_deg[l - 2][j] = 0;
+    }
+
+    for (j = 0; j < g->e_size; j++) {
+        s = g->edges[j].s;
+        t = g->edges[j].t;
+        g->G_adj[s][g->G_deg[l - 2][s]++] = t;
+        g->G_adj[t][g->G_deg[l - 2][t]++] = s;
+    }
+
+    auto *list = new KeyVal_t[truss_num + 1];
+    for (j = 0; j < g->v_size; j++) {
+        list[j].key = j;
+        list[j].val = g->G_deg[l - 2][j];
+    }
+    sort(list, list + g->v_size);
+
+    for (j = 0; j < g->v_size; j++) {
+        u = list[j].key;
+        for (k = 0; k < g->G_deg[l - 2][u]; k++) {
+            v = g->G_adj[u][k];
+            g->used[l - 2][g->col[v]] = true;
+        }
+        for (c = 1; g->used[l - 2][c]; c++);
+        g->col[u] = c;
+        for (k = 0; k < g->G_deg[l - 2][u]; k++) {
+            v = g->G_adj[u][k];
+            g->used[l - 2][g->col[v]] = false;
+        }
+    }
+    delete[] list;
+
+    g->sub_v_size[l - 2] = 0;
+
+    for (j = 0; j < g->v_size; j++) {
+        g->sub_v[l - 2][g->sub_v_size[l - 2]++] = j;
+    }
+
+    g->sub_e_size[l - 2] = 0;
+    for (j = 0; j < g->e_size; j++) {
+        g->sub_e[l - 2][g->sub_e_size[l - 2]++] = j;
+        s = g->edges[j].s;
+        t = g->edges[j].t;
+        g->edges[j].s = (g->col[s] > g->col[t]) ? s : t;
+        g->edges[j].t = (g->col[s] > g->col[t]) ? t : s;
+        s = g->edges[j].s;
+        t = g->edges[j].t;
+
+        g->DAG_adj[s][g->DAG_deg[l - 2][s]++] = t;
+    }
+
+    return;
+}
+
+void EBBkC_Graph_t::EBBkC_plus_plus_parallel(int l, unsigned long long *cliques) {
+    int c, i, j, k, p, e, e_, u, v, w, s, t, end, dist;
+
+    if (sub_v_size[l] < l || sub_e_size[l] < l * (l - 1) / 2) return;
+
+    if (K == 3) {
+        (*cliques) += v_size;
+        return;
+    }
+
+    if (K == 4) {
+        (*cliques) += e_size;
+        return;
+    }
+
+    if (l == 2) {
+        for (i = 0; i < sub_v_size[l]; i++) {
+            u = sub_v[l][i];
+
+            for (j = 0; j < DAG_deg[l][u]; j++) {
+                (*cliques)++;
+            }
+        }
+
+        return;
+    }
+
+    if (l == 3) {
+
+        for (i = 0; i < sub_v_size[l]; i++) {
+            u = sub_v[l][i];
+
+            if (col[u] < l) continue;
+
+            for (j = 0; j < DAG_deg[l][u]; j++) {
+                v = DAG_adj[u][j];
+                lab[v] = l - 1;
+            }
+
+            for (j = 0; j < DAG_deg[l][u]; j++) {
+                v = DAG_adj[u][j];
+
+                if (col[v] < l - 1) continue;
+
+                for (k = 0; k < DAG_deg[l][v]; k++) {
+                    w = DAG_adj[v][k];
+                    if (lab[w] == l - 1) (*cliques)++;
+                }
+            }
+
+            for (j = 0; j < DAG_deg[l][u]; j++) {
+                v = DAG_adj[u][j];
+                lab[v] = l;
+            }
+        }
+
+        return;
+    }
+
+    if (can_terminate(l, cliques)) {
+        return;
+    }
+
+    for (i = 0; i < sub_v_size[l]; i++) {
+        u = sub_v[l][i];
+
+        if (col[u] < l) continue;
+
+        sub_v_size[l - 1] = 0;
+        dist = 0;
+
+        for (j = 0; j < DAG_deg[l][u]; j++) {
+            v = DAG_adj[u][j];
+            lab[v] = l - 1;
+            sub_v[l - 1][sub_v_size[l - 1]++] = v;
+            DAG_deg[l - 1][v] = 0;
+            G_deg[l - 1][v] = 0;
+
+            if (!used[l][col[v]]) {
+                used[l][col[v]] = true;
+                dist++;
+            }
+        }
+
+        if (dist >= l - 1) {
+
+            sub_e_size[l - 1] = 0;
+            for (j = 0; j < sub_v_size[l - 1]; j++) {
+                v = sub_v[l - 1][j];
+
+                end = DAG_deg[l][v];
+                for (k = 0; k < end; k++) {
+                    w = DAG_adj[v][k];
+                    if (lab[w] == l - 1) {
+                        DAG_deg[l - 1][v]++;
+                        sub_e_size[l - 1]++;
+
+                        // just for early-termination
+                        G_deg[l - 1][v]++;
+                        G_deg[l - 1][w]++;
+
+                    } else {
+                        DAG_adj[v][k--] = DAG_adj[v][--end];
+                        DAG_adj[v][end] = w;
+                    }
+                }
+            }
+
+            EBBkC_plus_plus_parallel(l - 1, cliques);
+        }
+
+        for (j = 0; j < sub_v_size[l - 1]; j++) {
+            v = sub_v[l - 1][j];
+            lab[v] = l;
+            used[l][col[v]] = false;
+        }
+    }
+}
 
 void EBBkC_Comb_list(int *list, int list_size, int start, int picked, int k, unsigned long long *cliques) {
     if (picked == k) {
@@ -1024,7 +1245,7 @@ double EBBkC_t::list_k_clique(const char *file_name) {
     G.read_ordered_edges_from_file(file_name);
 
     printf("Building necessary data structure ...\n");
-    G.build_from_G();
+    G.build(false);
 
     printf("Iterate over all cliques\n");
 
@@ -1032,6 +1253,41 @@ double EBBkC_t::list_k_clique(const char *file_name) {
     G.EBBkC_plus_plus(K, &N);
     GetCurTime(&end);
     runtime = GetTime(&start, &end);
+
+    return runtime;
+}
+
+double EBBkC_t::list_k_clique_parallel(const char *file_name) {
+    double runtime = 0, runtime1 = 0;
+    int n_edges, i;
+//    struct rusage start, end;
+    double start, end;
+    EBBkC_Graph_t G, g;
+
+    printf("Reading edges from %s ...\n", file_name);
+    G.read_ordered_edges_from_file(file_name);
+
+    printf("Building necessary data structure ...\n");
+    G.build(false);
+
+    printf("Iterate over all cliques\n");
+
+#pragma omp parallel private(g, start, end, n_edges, i) reduction(+:N) reduction(max:runtime)
+    {
+        n_edges = 0;
+        start = omp_get_wtime();
+        g.truss_num = G.truss_num;
+        g.build(true);
+#pragma omp for schedule(dynamic, 1) nowait
+        for (i = 0; i < G.e_size; i++) {
+            G.branch(i, &g);
+            g.EBBkC_plus_plus_parallel(K - 2, &N);
+            n_edges++;
+        }
+        double end = omp_get_wtime();
+        runtime = (end - start) * 1e3;
+        printf("Thread: %d, Runtime = %.2lf ms, handled %d edges\n", omp_get_thread_num(), runtime, n_edges);
+    }
 
     return runtime;
 }
