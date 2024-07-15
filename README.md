@@ -18,11 +18,11 @@ cmake ..
 make
 ```
 
-After running the codes, there will be two executable files: one is called `BBkC` and the other is called `truss`, which means you have already compiled our codes. 
+After running the codes, there will be an executable files called `BBkC`, which means you have already compiled our codes. 
 
 ## Step 1 - Pre-processing Procedure
 
-When the graph is downloaded from the [Graph Repository](https://networkrepository.com/), the graph may have some comments at the very beginning, please ensure those comments are deleted before running the codes. The graph file may contain a number of edges, with each edge occupying a line (e.g., [nasasrb.edges](./dataset/nasasrb.edges)). Besides, the edges may also have some other attributes (e.g., [facebook.edges](./dataset/facebook.edges)). Our codes can handle both cases by only focusing on the first two elements of each edge, which represent the endpoints of the edge. 
+When the graph is downloaded from the [Graph Repository](https://networkrepository.com/), the graph may have some comments at the very beginning, please ensure those comments are deleted before running the codes. The graph file may contain a number of edges, with each edge occupying a line (e.g., [nasasrb.edges](./dataset/nasasrb/nasasrb.edges)). Besides, the edges may also have some other attributes (e.g., [facebook.edges](./dataset/facebook/facebook.edges)). Our codes can handle both cases by only focusing on the first two elements of each edge, which represent the endpoints of the edge. 
 
 To pre-process the graph, run the following command: 
 
@@ -33,14 +33,14 @@ To pre-process the graph, run the following command:
 For example, 
 
 ```bash
-./BBkC p ../../dataset/facebook.edges     # pre-process the `facebook` dataset
-./BBkC p ../../dataset/nasasrb.edges      # pre-process the `nasasrb` dataset
+./BBkC p ../../dataset/facebook/facebook.edges     # pre-process the `facebook` dataset
+./BBkC p ../../dataset/nasasrb/nasasrb.edges      # pre-process the `nasasrb` dataset
 ```
 
 For `facebook` dataset, since it contains many duplicate edges, it outputs
 
 ```
-Pre-process ../../dataset/facebook.edges
+Pre-process ../../dataset/facebook/facebook.edges
 ... duplicates.
 Pre-processed in 3917.07 ms
 ```
@@ -48,33 +48,31 @@ Pre-processed in 3917.07 ms
 For `nasasrb`, since it contains no duplicate edges and no self-loops, it outputs
 
 ```
-Pre-process ../../dataset/nasasrb.edges
+Pre-process ../../dataset/nasasrb/nasasrb.edges
 Pre-processed in 4535.87 ms
 ```
 
-The pre-processing procedure will output a file with the prefix same as the original file but end with `.clean`. 
-
-We will use the `.index` file for the listing procedure. 
+The pre-processing procedure will output a file with the prefix same as the original file but end with `.clean`. Once this procedure is finished, we shall change the edge to another format using the libraries introduced by Prof. Lijun Chang. The code and its usage can be found in this [Repo](https://github.com/LijunChang/Cohesive_subgraph_book/tree/master/datasets). Once the the graph format is changed, each directory will have two binary files, one is b_adj.bin and the other is b_degree.bin.
 
 ## Step 2 - Serial Listing Procedure
 
 To list $k$-cliques in the graph, we need to specify the value of $k$. In addition, we also need to specify a value of $t$ to control when we should conduct the early termination (details can be found in our paper). Therefore, the running command is: 
 
 ```bash
-./BBkC e /PATH_TO_INDEX_DATA k_val t_val
+./BBkC e DIRECTORY_OF_BINARY_DATAS k_val t_val
 ```
 
 For example, 
 
 ```bash
-./BBkC e ../../dataset/facebook.index 20 3    # list 20-clique in `facebook` with early-termination in 3-plex 
-./BBkC e ../../dataset/nasasrb.index 12 2     # list 12-clique in `nasasrb` with early-termination in 2-plex
+./BBkC e ../../dataset/facebook 20 3    # list 20-clique in `facebook` with early-termination in 3-plex 
+./BBkC e ../../dataset/nasasrb 12 2     # list 12-clique in `nasasrb` with early-termination in 2-plex
 ```
 
 For `facebook` dataset, it outputs
 
 ```
-Reading edges from ../../dataset/facebook.index ...
+Reading edges from ../../dataset/facebook ...
 |V| = 2543, |E| = 62844
 Truss number = 35
 Building necessary data structure ...
@@ -86,7 +84,7 @@ EBBkC+ET (t = 3) runtime 1391.73 ms
 For `nasasrb` dataset, it outputs
 
 ```
-Reading edges from ../../dataset/nasasrb.index ...
+Reading edges from ../../dataset/nasasrb ...
 |V| = 54567, |E| = 1299405
 Truss number = 23
 Building necessary data structure ...
@@ -100,13 +98,13 @@ EBBkC+ET (t = 2) runtime 12683.40 ms
 To list $k$-cliques in the graph with multiple threads, we need to specify an additional parameter to indicate the number of threads to be used. Therefore, the running command is: 
 
 ```bash
-./BBkC ep /PATH_TO_INDEX_DATA k_val t_val p_val
+./BBkC ep DIRECTORY_OF_BINARY_DATAS k_val t_val p_val
 ```
 
 For example, 
 
 ```bash
-./BBkC ep ../../dataset/nasasrb.index 12 3 16   # list 12-clique in `nasasrb` with early-termination in 3-plex with 16 threads
+./BBkC ep ../../dataset/nasasrb 12 3 16   # list 12-clique in `nasasrb` with early-termination in 3-plex with 16 threads
 ```
 
 It should outputs
