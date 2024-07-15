@@ -238,131 +238,131 @@ void EBBkC_Graph_t::read_ordered_edges_from_file(const char *file_name) {
     fclose(fp);
     delete [] old2new;
 }
-
-void EBBkC_Graph_t::truss_decompose(const char* w_file_name) {
-
-    int i, j, k, s, t, w, end, edge_seq = 1, sw, wt;
-
-    auto *_d = new int [v_size]();
-    auto *_cd = new int [v_size + 1];
-    auto *_adj = new int [2 * e_size];
-
-    for (i = 0; i < e_size; i++) {
-        _d[edges[i].s]++;
-        _d[edges[i].t]++;
-    }
-    _cd[0] = 0;
-    for (i = 1; i < v_size + 1; i++) {
-        _cd[i] = _cd[i - 1] + _d[i - 1];
-        _d[i - 1] = 0;
-    }
-    for (i = 0; i < e_size; i++) {
-        _adj[_cd[edges[i].s] + _d[edges[i].s]++] = edges[i].t;
-        _adj[_cd[edges[i].t] + _d[edges[i].t]++] = edges[i].s;
-    }
-
-    KeyVal_t kv;
-    Heap_t heap;
-    Edge_t  e;
-
-    auto *sup = new int [e_size]();
-    auto *h_table = new bool [v_size]();
-    unordered_map<Edge_t, int, Edge_t::Hash_Edge_t> edge_id;
-
-    unordered_map<Edge_t, int, Edge_t::Hash_Edge_t> edge_truss;
-    unordered_map<Edge_t, int, Edge_t::Hash_Edge_t> edge_rank;
-    unordered_map<Edge_t, vector<int>, Edge_t::Hash_Edge_t> edge_sub;
-
-    for (i = 0; i < e_size; i++) {
-
-        edge_id[edges[i]] = i;
-
-        s = _d[edges[i].s] < _d[edges[i].t] ? edges[i].s : edges[i].t;
-        t = _d[edges[i].s] < _d[edges[i].t] ? edges[i].t : edges[i].s;
-
-        for (j = _cd[s]; j < _cd[s + 1]; j++) {
-            w = _adj[j];
-            h_table[w] = true;
-        }
-
-        for (j = _cd[t]; j < _cd[t + 1]; j++) {
-            w = _adj[j];
-            if (h_table[w])
-                sup[i]++;
-        }
-
-        for (j = _cd[s]; j < _cd[s + 1]; j++) {
-            w = _adj[j];
-            h_table[w] = false;
-        }
-    }
-
-    heap.make_heap(sup, e_size);
-
-    for (k = 3; !heap.empty(); k++) {
-
-        while (!heap.empty() && heap.min_element().val < k - 2) {
-            kv = heap.pop();
-            e = edges[kv.key];
-            edge_truss[e] = k;
-            edge_rank[e] = edge_seq++;
-
-            s = _d[e.s] < _d[e.t] ? e.s : e.t;
-            t = _d[e.s] < _d[e.t] ? e.t : e.s;
-
-            end = _cd[s] + _d[s];
-            for (j = _cd[s]; j < end; j++) {
-                w = _adj[j];
-                h_table[w] = true;
-            }
-
-            end = _cd[t] + _d[t];
-            for (j = _cd[t]; j < end; j++) {
-                w = _adj[j];
-
-                if (w == s) {
-                    _adj[j--] = _adj[--end];
-                    _d[t]--;
-                }
-
-                if (h_table[w]) {
-                    edge_sub[e].push_back(w);
-                    heap.update(edge_id[Edge_t(s, w, false)]);
-                    heap.update(edge_id[Edge_t(w, t, false)]);
-                }
-            }
-
-            end = _cd[s] + _d[s];
-            for (j = _cd[s]; j < end; j++) {
-                w = _adj[j];
-                h_table[w] = false;
-
-                if (w == t) {
-                    _adj[j--] = _adj[--end];
-                    _d[s]--;
-                }
-            }
-        }
-    }
-
-    heap.release_heap();
-
-    FILE *fp = fopen(w_file_name, "w");
-
-    for (i = 0; i < e_size; i++) {
-        e = edges[i];
-        fprintf(fp, "%d %d %d %d %ld ", new2old[e.s], new2old[e.t], edge_truss[e], edge_rank[e], edge_sub[e].size());
-        for (j = 0; j < edge_sub[e].size(); j++) fprintf(fp, "%d ", new2old[edge_sub[e][j]]);
-        fprintf(fp, "\n");
-    }
-
-    fclose(fp);
-
-    delete [] _d;
-    delete [] _cd;
-    delete [] _adj;
-    delete [] h_table;
-}
+//
+//void EBBkC_Graph_t::truss_decompose(const char* w_file_name) {
+//
+//    int i, j, k, s, t, w, end, edge_seq = 1, sw, wt;
+//
+//    auto *_d = new int [v_size]();
+//    auto *_cd = new int [v_size + 1];
+//    auto *_adj = new int [2 * e_size];
+//
+//    for (i = 0; i < e_size; i++) {
+//        _d[edges[i].s]++;
+//        _d[edges[i].t]++;
+//    }
+//    _cd[0] = 0;
+//    for (i = 1; i < v_size + 1; i++) {
+//        _cd[i] = _cd[i - 1] + _d[i - 1];
+//        _d[i - 1] = 0;
+//    }
+//    for (i = 0; i < e_size; i++) {
+//        _adj[_cd[edges[i].s] + _d[edges[i].s]++] = edges[i].t;
+//        _adj[_cd[edges[i].t] + _d[edges[i].t]++] = edges[i].s;
+//    }
+//
+//    KeyVal_t kv;
+//    Heap_t heap;
+//    Edge_t  e;
+//
+//    auto *sup = new int [e_size]();
+//    auto *h_table = new bool [v_size]();
+//    unordered_map<Edge_t, int, Edge_t::Hash_Edge_t> edge_id;
+//
+//    unordered_map<Edge_t, int, Edge_t::Hash_Edge_t> edge_truss;
+//    unordered_map<Edge_t, int, Edge_t::Hash_Edge_t> edge_rank;
+//    unordered_map<Edge_t, vector<int>, Edge_t::Hash_Edge_t> edge_sub;
+//
+//    for (i = 0; i < e_size; i++) {
+//
+//        edge_id[edges[i]] = i;
+//
+//        s = _d[edges[i].s] < _d[edges[i].t] ? edges[i].s : edges[i].t;
+//        t = _d[edges[i].s] < _d[edges[i].t] ? edges[i].t : edges[i].s;
+//
+//        for (j = _cd[s]; j < _cd[s + 1]; j++) {
+//            w = _adj[j];
+//            h_table[w] = true;
+//        }
+//
+//        for (j = _cd[t]; j < _cd[t + 1]; j++) {
+//            w = _adj[j];
+//            if (h_table[w])
+//                sup[i]++;
+//        }
+//
+//        for (j = _cd[s]; j < _cd[s + 1]; j++) {
+//            w = _adj[j];
+//            h_table[w] = false;
+//        }
+//    }
+//
+//    heap.make_heap(sup, e_size);
+//
+//    for (k = 3; !heap.empty(); k++) {
+//
+//        while (!heap.empty() && heap.min_element().val < k - 2) {
+//            kv = heap.pop();
+//            e = edges[kv.key];
+//            edge_truss[e] = k;
+//            edge_rank[e] = edge_seq++;
+//
+//            s = _d[e.s] < _d[e.t] ? e.s : e.t;
+//            t = _d[e.s] < _d[e.t] ? e.t : e.s;
+//
+//            end = _cd[s] + _d[s];
+//            for (j = _cd[s]; j < end; j++) {
+//                w = _adj[j];
+//                h_table[w] = true;
+//            }
+//
+//            end = _cd[t] + _d[t];
+//            for (j = _cd[t]; j < end; j++) {
+//                w = _adj[j];
+//
+//                if (w == s) {
+//                    _adj[j--] = _adj[--end];
+//                    _d[t]--;
+//                }
+//
+//                if (h_table[w]) {
+//                    edge_sub[e].push_back(w);
+//                    heap.update(edge_id[Edge_t(s, w, false)]);
+//                    heap.update(edge_id[Edge_t(w, t, false)]);
+//                }
+//            }
+//
+//            end = _cd[s] + _d[s];
+//            for (j = _cd[s]; j < end; j++) {
+//                w = _adj[j];
+//                h_table[w] = false;
+//
+//                if (w == t) {
+//                    _adj[j--] = _adj[--end];
+//                    _d[s]--;
+//                }
+//            }
+//        }
+//    }
+//
+//    heap.release_heap();
+//
+//    FILE *fp = fopen(w_file_name, "w");
+//
+//    for (i = 0; i < e_size; i++) {
+//        e = edges[i];
+//        fprintf(fp, "%d %d %d %d %ld ", new2old[e.s], new2old[e.t], edge_truss[e], edge_rank[e], edge_sub[e].size());
+//        for (j = 0; j < edge_sub[e].size(); j++) fprintf(fp, "%d ", new2old[edge_sub[e][j]]);
+//        fprintf(fp, "\n");
+//    }
+//
+//    fclose(fp);
+//
+//    delete [] _d;
+//    delete [] _cd;
+//    delete [] _adj;
+//    delete [] h_table;
+//}
 
 
 void EBBkC_Graph_t::build(bool sub) {
@@ -437,348 +437,561 @@ void EBBkC_Graph_t::build(bool sub) {
     loc = new int [node_size];
 }
 
+//
+//void EBBkC_Graph_t::EBBkC(int l, unsigned long long *cliques) {
+//    int i, j, k, u, e, e_, _e, end;
+//
+//    if (sub_v_size[l] < l || sub_e_size[l] < l * (l - 1) / 2) return;
+//
+//    if (l == K) {
+//        if (K == 3) {
+//            for (i = 0; i < sub_e_size[l]; i++) {
+//                e = sub_e[l][i];
+//
+//                for (j = 0; j < T_size[e]; j++) {
+//                    (*cliques)++;
+//                }
+//            }
+//        }
+//        else if (K == 4) {
+//            for (i = 0; i < sub_e_size[l]; i++) {
+//                e = sub_e[l][i];
+//
+//                for (j = 0; j < C_size[e]; j++) {
+//                    (*cliques)++;
+//                }
+//            }
+//        }
+//        else {
+//
+//            for (i = 0; i < sub_e_size[l]; i++) {
+//                e = sub_e[l][i];
+//
+//                sort(T[e], T[e] + T_size[e]);
+//                sort(C[e], C[e] + C_size[e]);
+//            }
+//
+//            for (i = 0; i < sub_e_size[l]; i++) {
+//                e = sub_e[l][i];
+//
+//                if (T_size[e] < l - 2 || C_size[e] < (l - 2) * (l - 3) / 2) continue;
+//
+//                sub_v_size[l - 2] = 0;
+//
+//                for (j = 0; j < T_size[e]; j++) {
+//                    u = T[e][j];
+//                    sub_v[l - 2][sub_v_size[l - 2]++] = u;
+//                }
+//
+//                sub_e_size[l - 2] = 0;
+//
+//                for (j = 0; j < C_size[e]; j++) {
+//                    e_ = C[e][j];
+//                    sub_e[l - 2][sub_e_size[l - 2]++] = e_;
+//                }
+//
+//                EBBkC(l - 2, cliques);
+//
+//            }
+//        }
+//
+//        return;
+//    }
+//
+//    for (i = 0; i < sub_e_size[l]; i++) {
+//        e = sub_e[l][i];
+//
+//        if (l == 3) {
+//            sub_v_size[l - 2] = intersect_simd4x(sub_v[l], sub_v_size[l], T[e], T_size[e], sub_v[l - 2]);
+//            for (j = 0; j < sub_v_size[l - 2]; j++) {
+//                (*cliques)++;
+//            }
+//        }
+//
+//        else if (l == 4) {
+//             sub_e_size[l - 2] = intersect_simd4x(sub_e[l], sub_e_size[l], C[e], C_size[e], sub_e[l - 2]);
+//             for (j = 0; j < sub_e_size[l - 2]; j++) {
+//                (*cliques)++;
+//             }
+//        }
+//
+//        else {
+//            sub_v_size[l - 2] = intersect_simd4x(sub_v[l], sub_v_size[l], T[e], T_size[e], sub_v[l - 2]);
+//            sub_e_size[l - 2] = intersect_simd4x(sub_e[l], sub_e_size[l], C[e], C_size[e], sub_e[l - 2]);
+//            EBBkC(l - 2, cliques);
+//        }
+//    }
+//}
+//
+//
+//void EBBkC_Graph_t::EBBkC_plus(int l, unsigned long long *cliques) {
+//    int c, i, j, k, e, e_, u, v, w, s, t, end, dist;
+//
+//    if (sub_v_size[l] < l) return;
+//
+//    if (l == K) {
+//        if (K == 3) {
+//            for (i = 0; i < sub_e_size[l]; i++) {
+//                 e = sub_e[l][i];
+//
+//                 for (j = 0; j < T_size[e]; j++) {
+//                    (*cliques)++;
+//                 }
+//            }
+//        }
+//        else if (K == 4) {
+//            for (i = 0; i < sub_e_size[l]; i++) {
+//                e = sub_e[l][i];
+//
+//                for (j = 0; j < C_size[e]; j++) {
+//                    (*cliques)++;
+//                }
+//            }
+//        }
+//        else {
+//            for (i = 0; i < sub_e_size[l]; i++) {
+//                e = sub_e[l][i];
+//
+//                if (T_size[e] < l - 2 || C_size[e] < (l - 2) * (l - 3) / 2) continue;
+//
+//                for (j = 0; j < T_size[e]; j++) {
+//                    u = T[e][j];
+//                    col[u] = 0;
+//                    DAG_deg[0][u] = 0;
+//                    G_deg[l - 2][u] = 0;
+//                }
+//
+//                for (j = 0; j < C_size[e]; j++) {
+//                    e_ = C[e][j];
+//                    s = edges[e_].s;
+//                    t = edges[e_].t;
+//                    G_adj[s][G_deg[l - 2][s]++] = t;
+//                    G_adj[t][G_deg[l - 2][t]++] = s;
+//                }
+//
+//                auto *list = new KeyVal_t [truss_num + 1];
+//                for (j = 0; j < T_size[e]; j++) {
+//                    u = T[e][j];
+//                    list[j].key = u;
+//                    list[j].val = G_deg[l - 2][u];
+//                }
+//                sort(list, list + T_size[e]);
+//
+//                for (j = 0; j < T_size[e]; j++) {
+//                    u = list[j].key;
+//                    for (k = 0; k < G_deg[l - 2][u]; k++) {
+//                        v = G_adj[u][k];
+//                        used[K][col[v]] = true;
+//                    }
+//                    for (c = 1; used[K][c]; c++) ;
+//                    col[u] = c;
+//                    for (k = 0; k < G_deg[l - 2][u]; k++) {
+//                        v = G_adj[u][k];
+//                        used[K][col[v]] = false;
+//                    }
+//                }
+//                delete [] list;
+//
+//                sub_v_size[l - 2] = 0;
+//                dist = 0;
+//
+//                for (j = 0; j < T_size[e]; j++) {
+//                    u = T[e][j];
+//                    sub_v[l - 2][sub_v_size[l - 2]++] = u;
+//                    if (!used[K][col[u]]) {
+//                        used[K][col[u]] = true;
+//                        dist++;
+//                    }
+//                }
+//
+//                if (dist >= l - 2) {
+//                    sort(sub_v[l - 2], sub_v[l - 2] + sub_v_size[l - 2]);
+//
+//                    sub_e_size[l - 2] = 0;
+//                    for (j = 0; j < C_size[e]; j++) {
+//                        e_ = C[e][j];
+//                        sub_e[l - 2][sub_e_size[l - 2]++] = e_;
+//                        s = edges[e_].s;
+//                        t = edges[e_].t;
+//                        edges[e_].s = (col[s] > col[t]) ? s : t;
+//                        edges[e_].t = (col[s] > col[t]) ? t : s;
+//                        s = edges[e_].s;
+//                        t = edges[e_].t;
+//                        DAG_adj[s][DAG_deg[0][s]++] = t;
+//                    }
+//
+//                    for (j = 0; j < T_size[i]; j++) {
+//                        u = T[e][j];
+//                        // sorted array for SIMD usage, DAG_adj can be considered as const.
+//                        sort(DAG_adj[u], DAG_adj[u] + DAG_deg[0][u]);
+//                    }
+//
+//                    EBBkC_plus(l - 2, cliques);
+//                }
+//
+//                for (j = 0; j < T_size[e]; j++) {
+//                    u = T[e][j];
+//                    used[K][col[u]] = false;
+//                }
+//            }
+//        }
+//
+//        return;
+//    }
+//
+//    if (l == 1) {
+//        for (i = 0; i < sub_v_size[l]; i++) {
+//            (*cliques)++;
+//        }
+//
+//        return;
+//    }
+//
+//    for (i = 0; i < sub_v_size[l]; i++) {
+//        u = sub_v[l][i];
+//
+//        if (col[u] < l) continue;
+//
+//        sub_v_size[l - 1] = intersect_simd4x(sub_v[l], sub_v_size[l], DAG_adj[u], DAG_deg[0][u], sub_v[l - 1]);
+//
+//        if (l == 2) {
+//            for (j = 0; j < sub_v_size[l - 1]; j++) {
+//                (*cliques)++;
+//            }
+//        }
+//
+//        else {
+//            if (sub_v_size[l - 1] >= l - 1) {
+//                EBBkC_plus(l - 1, cliques);
+//            }
+//        }
+//    }
+//}
 
-void EBBkC_Graph_t::EBBkC(int l, unsigned long long *cliques) {
-    int i, j, k, u, e, e_, _e, end;
+//
+//void EBBkC_Graph_t::EBBkC_plus_plus(int l, unsigned long long *cliques) {
+//    int c, i, j, k, p, e, e_, u, v, w, s, t, end, dist;
+//
+//    if (l == K) {
+//
+//        for (i = 0; i < v_size; i++) sub_v[K][sub_v_size[K]++] = i;
+//
+//        for (i = 0; i < e_size; i++) sub_e[K][sub_e_size[K]++] = i;
+//
+//        if (K == 3) {
+//            for (i = 0; i < sub_e_size[l]; i++) {
+//                e = sub_e[l][i];
+//                for (j = 0; j < T_size[e]; j++) {
+//                    (*cliques)++;
+//                }
+//            }
+//        }
+//        else if (K == 4) {
+//            for (i = 0; i < sub_e_size[l]; i++) {
+//                e = sub_e[l][i];
+//                for (j = 0; j < C_size[e]; j++) {
+//                    (*cliques)++;
+//                }
+//            }
+//        }
+//        else {
+//            for (i = 0; i < sub_e_size[l]; i++) {
+//                e = sub_e[l][i];
+//
+//                if (T_size[e] < l - 2 || C_size[e] < (l - 2) * (l - 3) / 2) continue;
+//
+//                for (j = 0; j < T_size[e]; j++) {
+//                    u = T[e][j];
+//                    col[u] = 0;
+//                    DAG_deg[l - 2][u] = 0;
+//                    G_deg[l - 2][u] = 0;
+//                }
+//
+//                for (j = 0; j < C_size[e]; j++) {
+//                    e_ = C[e][j];
+//                    s = edges[e_].s;
+//                    t = edges[e_].t;
+//                    G_adj[s][G_deg[l - 2][s]++] = t;
+//                    G_adj[t][G_deg[l - 2][t]++] = s;
+//                }
+//
+//                auto *list = new KeyVal_t [truss_num + 1];
+//                for (j = 0; j < T_size[e]; j++) {
+//                    u = T[e][j];
+//                    list[j].key = u;
+//                    list[j].val = G_deg[l - 2][u];
+//                }
+//                sort(list, list + T_size[e]);
+//
+//                for (j = 0; j < T_size[e]; j++) {
+//                    u = list[j].key;
+//                    for (k = 0; k < G_deg[l - 2][u]; k++) {
+//                        v = G_adj[u][k];
+//                        used[K][col[v]] = true;
+//                    }
+//                    for (c = 1; used[K][c]; c++) ;
+//                    col[u] = c;
+//                    for (k = 0; k < G_deg[l - 2][u]; k++) {
+//                        v = G_adj[u][k];
+//                        used[K][col[v]] = false;
+//                    }
+//                }
+//                delete [] list;
+//
+//                sub_v_size[l - 2] = 0;
+//                dist = 0;
+//
+//                for (j = 0; j < T_size[e]; j++) {
+//                    u = T[e][j];
+//                    sub_v[l - 2][sub_v_size[l - 2]++] = u;
+//                    if (!used[K][col[u]]) {
+//                        used[K][col[u]] = true;
+//                        dist++;
+//                    }
+//                }
+//
+//                if (dist >= l - 2) {
+//                    sub_e_size[l - 2] = 0;
+//                    for (j = 0; j < C_size[e]; j++) {
+//                        e_ = C[e][j];
+//                        sub_e[l - 2][sub_e_size[l - 2]++] = e_;
+//                        s = edges[e_].s;
+//                        t = edges[e_].t;
+//                        edges[e_].s = (col[s] > col[t]) ? s : t;
+//                        edges[e_].t = (col[s] > col[t]) ? t : s;
+//                        s = edges[e_].s;
+//                        t = edges[e_].t;
+//
+//                        DAG_adj[s][DAG_deg[l - 2][s]++] = t;
+//                    }
+//
+//                    EBBkC_plus_plus(l - 2, cliques);
+//                }
+//
+//                for (j = 0; j < T_size[e]; j++) {
+//                    u = T[e][j];
+//                    used[K][col[u]] = false;
+//                }
+//            }
+//        }
+//
+//        return;
+//    }
+//
+//    if (sub_v_size[l] < l || sub_e_size[l] < l * (l - 1) / 2) return;
+//
+//    if (l == 2) {
+//        for (i = 0; i < sub_v_size[l]; i++) {
+//            u = sub_v[l][i];
+//
+//            for (j = 0; j < DAG_deg[l][u]; j++) {
+//                (*cliques)++;
+//            }
+//        }
+//
+//        return;
+//    }
+//
+//    if (l == 3) {
+//
+//        for (i = 0; i < sub_v_size[l]; i++) {
+//            u = sub_v[l][i];
+//
+//            if (col[u] < l) continue;
+//
+//            for (j = 0; j < DAG_deg[l][u]; j++) {
+//                v = DAG_adj[u][j];
+//                lab[v] = l - 1;
+//            }
+//
+//            for (j = 0; j < DAG_deg[l][u]; j++) {
+//                v = DAG_adj[u][j];
+//
+//                if (col[v] < l - 1) continue;
+//
+//                for (k = 0; k < DAG_deg[l][v]; k++) {
+//                    w = DAG_adj[v][k];
+//                    if (lab[w] == l - 1) (*cliques)++;
+//                }
+//            }
+//
+//            for (j = 0; j < DAG_deg[l][u]; j++) {
+//                v = DAG_adj[u][j];
+//                lab[v] = l;
+//            }
+//        }
+//
+//        return;
+//    }
+//
+//    if (can_terminate(l, cliques)) {
+//        return;
+//    }
+//
+//    for (i = 0; i < sub_v_size[l]; i++) {
+//        u = sub_v[l][i];
+//
+//        if (col[u] < l) continue;
+//
+//        sub_v_size[l - 1] = 0;
+//        dist = 0;
+//
+//        for (j = 0; j < DAG_deg[l][u]; j++) {
+//            v = DAG_adj[u][j];
+//            lab[v] = l - 1;
+//            sub_v[l - 1][sub_v_size[l - 1]++] = v;
+//            DAG_deg[l - 1][v] = 0;
+//            G_deg[l - 1][v] = 0;
+//
+//            if (!used[l][col[v]]) {
+//                used[l][col[v]] = true;
+//                dist++;
+//            }
+//        }
+//
+//        if (dist >= l - 1) {
+//
+//            sub_e_size[l - 1] = 0;
+//            for (j = 0; j < sub_v_size[l - 1]; j++) {
+//                v = sub_v[l - 1][j];
+//
+//                end = DAG_deg[l][v];
+//                for (k = 0; k < end; k++) {
+//                    w = DAG_adj[v][k];
+//                    if (lab[w] == l - 1) {
+//                        DAG_deg[l - 1][v]++;
+//                        sub_e_size[l - 1]++;
+//
+//                        // just for early-termination
+//                        G_deg[l - 1][v]++;
+//                        G_deg[l - 1][w]++;
+//
+//                    } else {
+//                        DAG_adj[v][k--] = DAG_adj[v][--end];
+//                        DAG_adj[v][end] = w;
+//                    }
+//                }
+//            }
+//
+//            EBBkC_plus_plus(l - 1, cliques);
+//        }
+//
+//        for (j = 0; j < sub_v_size[l - 1]; j++) {
+//            v = sub_v[l - 1][j];
+//            lab[v] = l;
+//            used[l][col[v]] = false;
+//        }
+//    }
+//}
 
-    if (sub_v_size[l] < l || sub_e_size[l] < l * (l - 1) / 2) return;
+void EBBkC_Graph_t::branch(int e, EBBkC_Graph_t* g) {
+    int c, i, j, k, p, e_, u, v, w, s, t, end, dist, l = K;
+    int *old2new = new int[v_size];
 
-    if (l == K) {
-        if (K == 3) {
-            for (i = 0; i < sub_e_size[l]; i++) {
-                e = sub_e[l][i];
+    g->v_size = 0;
+    g->e_size = 0;
+    g->edges = new Edge_t[C_size[e] + 1];
+    g->new2old = vector<int>(T_size[e]);
 
-                for (j = 0; j < T_size[e]; j++) {
-                    (*cliques)++;
-                }
-            }
-        }
-        else if (K == 4) {
-            for (i = 0; i < sub_e_size[l]; i++) {
-                e = sub_e[l][i];
+    for (i = 0; i < T_size[e]; i++) {
+        u = T[e][i];
+        old2new[u] = g->v_size;
+        g->new2old[g->v_size++] = u;
+    }
 
-                for (j = 0; j < C_size[e]; j++) {
-                    (*cliques)++;
-                }
-            }
-        }
-        else {
+    for (i = 0; i < C_size[e]; i++) {
+        e_ = C[e][i];
+        s = edges[e_].s;
+        t = edges[e_].t;
+        g->edges[g->e_size].s = old2new[s];
+        g->edges[g->e_size++].t = old2new[t];
+    }
 
-            for (i = 0; i < sub_e_size[l]; i++) {
-                e = sub_e[l][i];
+    delete [] old2new;
 
-                sort(T[e], T[e] + T_size[e]);
-                sort(C[e], C[e] + C_size[e]);
-            }
-            
-            for (i = 0; i < sub_e_size[l]; i++) {
-                e = sub_e[l][i];
-
-                if (T_size[e] < l - 2 || C_size[e] < (l - 2) * (l - 3) / 2) continue;
-
-                sub_v_size[l - 2] = 0;
-
-                for (j = 0; j < T_size[e]; j++) {
-                    u = T[e][j];
-                    sub_v[l - 2][sub_v_size[l - 2]++] = u;
-                }
-
-                sub_e_size[l - 2] = 0;
-
-                for (j = 0; j < C_size[e]; j++) {
-                    e_ = C[e][j];
-                    sub_e[l - 2][sub_e_size[l - 2]++] = e_;
-                }
-
-                EBBkC(l - 2, cliques);
-
-            }
-        }
-
+    if (l == 3 || l == 4) {
+        g->sub_v_size[l - 2] = g->v_size;
+        g->sub_e_size[l - 2] = g->e_size;
         return;
     }
 
-    for (i = 0; i < sub_e_size[l]; i++) {
-        e = sub_e[l][i];
+    if (g->v_size < l - 2 || g->e_size < (l - 2) * (l - 3) / 2) {
+        g->sub_v_size[l - 2] = g->v_size;
+        g->sub_e_size[l - 2] = g->e_size;
+        return;
+    }
 
-        if (l == 3) {
-            sub_v_size[l - 2] = intersect_simd4x(sub_v[l], sub_v_size[l], T[e], T_size[e], sub_v[l - 2]);
-            for (j = 0; j < sub_v_size[l - 2]; j++) {
-                (*cliques)++;
-            }
+    for (j = 0; j < g->v_size; j++) {
+        g->col[j] = 0;
+        g->DAG_deg[l - 2][j] = 0;
+        g->G_deg[l - 2][j] = 0;
+    }
+
+    for (j = 0; j < g->e_size; j++) {
+        s = g->edges[j].s;
+        t = g->edges[j].t;
+        g->G_adj[s][g->G_deg[l - 2][s]++] = t;
+        g->G_adj[t][g->G_deg[l - 2][t]++] = s;
+    }
+
+    auto *list = new KeyVal_t[truss_num + 1];
+    for (j = 0; j < g->v_size; j++) {
+        list[j].key = j;
+        list[j].val = g->G_deg[l - 2][j];
+    }
+    sort(list, list + g->v_size);
+
+    for (j = 0; j < g->v_size; j++) {
+        u = list[j].key;
+        for (k = 0; k < g->G_deg[l - 2][u]; k++) {
+            v = g->G_adj[u][k];
+            g->used[l - 2][g->col[v]] = true;
         }
-
-        else if (l == 4) {
-             sub_e_size[l - 2] = intersect_simd4x(sub_e[l], sub_e_size[l], C[e], C_size[e], sub_e[l - 2]);
-             for (j = 0; j < sub_e_size[l - 2]; j++) {
-                (*cliques)++;
-             }
-        }
-
-        else {
-            sub_v_size[l - 2] = intersect_simd4x(sub_v[l], sub_v_size[l], T[e], T_size[e], sub_v[l - 2]);
-            sub_e_size[l - 2] = intersect_simd4x(sub_e[l], sub_e_size[l], C[e], C_size[e], sub_e[l - 2]);
-            EBBkC(l - 2, cliques);
+        for (c = 1; g->used[l - 2][c]; c++);
+        g->col[u] = c;
+        for (k = 0; k < g->G_deg[l - 2][u]; k++) {
+            v = g->G_adj[u][k];
+            g->used[l - 2][g->col[v]] = false;
         }
     }
+    delete[] list;
+
+    g->sub_v_size[l - 2] = 0;
+
+    for (j = 0; j < g->v_size; j++) {
+        g->sub_v[l - 2][g->sub_v_size[l - 2]++] = j;
+    }
+
+    g->sub_e_size[l - 2] = 0;
+    for (j = 0; j < g->e_size; j++) {
+        g->sub_e[l - 2][g->sub_e_size[l - 2]++] = j;
+        s = g->edges[j].s;
+        t = g->edges[j].t;
+        g->edges[j].s = (g->col[s] > g->col[t]) ? s : t;
+        g->edges[j].t = (g->col[s] > g->col[t]) ? t : s;
+        s = g->edges[j].s;
+        t = g->edges[j].t;
+
+        g->DAG_adj[s][g->DAG_deg[l - 2][s]++] = t;
+    }
+
+    return;
 }
-
-
-void EBBkC_Graph_t::EBBkC_plus(int l, unsigned long long *cliques) {
-    int c, i, j, k, e, e_, u, v, w, s, t, end, dist;
-
-    if (sub_v_size[l] < l) return;
-
-    if (l == K) {
-        if (K == 3) {
-            for (i = 0; i < sub_e_size[l]; i++) {
-                 e = sub_e[l][i];
-
-                 for (j = 0; j < T_size[e]; j++) {
-                    (*cliques)++;
-                 }
-            }
-        }
-        else if (K == 4) {
-            for (i = 0; i < sub_e_size[l]; i++) {
-                e = sub_e[l][i];
-
-                for (j = 0; j < C_size[e]; j++) {
-                    (*cliques)++;
-                }
-            }
-        }
-        else {
-            for (i = 0; i < sub_e_size[l]; i++) {
-                e = sub_e[l][i];
-
-                if (T_size[e] < l - 2 || C_size[e] < (l - 2) * (l - 3) / 2) continue;
-
-                for (j = 0; j < T_size[e]; j++) {
-                    u = T[e][j];
-                    col[u] = 0;
-                    DAG_deg[0][u] = 0;
-                    G_deg[l - 2][u] = 0;
-                }
-
-                for (j = 0; j < C_size[e]; j++) {
-                    e_ = C[e][j];
-                    s = edges[e_].s;
-                    t = edges[e_].t;
-                    G_adj[s][G_deg[l - 2][s]++] = t;
-                    G_adj[t][G_deg[l - 2][t]++] = s;
-                }
-
-                auto *list = new KeyVal_t [truss_num + 1];
-                for (j = 0; j < T_size[e]; j++) {
-                    u = T[e][j];
-                    list[j].key = u;
-                    list[j].val = G_deg[l - 2][u];
-                }
-                sort(list, list + T_size[e]);
-
-                for (j = 0; j < T_size[e]; j++) {
-                    u = list[j].key;
-                    for (k = 0; k < G_deg[l - 2][u]; k++) {
-                        v = G_adj[u][k];
-                        used[K][col[v]] = true;
-                    }
-                    for (c = 1; used[K][c]; c++) ;
-                    col[u] = c;
-                    for (k = 0; k < G_deg[l - 2][u]; k++) {
-                        v = G_adj[u][k];
-                        used[K][col[v]] = false;
-                    }
-                }
-                delete [] list;
-
-                sub_v_size[l - 2] = 0;
-                dist = 0;
-
-                for (j = 0; j < T_size[e]; j++) {
-                    u = T[e][j];
-                    sub_v[l - 2][sub_v_size[l - 2]++] = u;
-                    if (!used[K][col[u]]) {
-                        used[K][col[u]] = true;
-                        dist++;
-                    }
-                }
-
-                if (dist >= l - 2) {
-                    sort(sub_v[l - 2], sub_v[l - 2] + sub_v_size[l - 2]);
-
-                    sub_e_size[l - 2] = 0;
-                    for (j = 0; j < C_size[e]; j++) {
-                        e_ = C[e][j];
-                        sub_e[l - 2][sub_e_size[l - 2]++] = e_;
-                        s = edges[e_].s;
-                        t = edges[e_].t;
-                        edges[e_].s = (col[s] > col[t]) ? s : t;
-                        edges[e_].t = (col[s] > col[t]) ? t : s;
-                        s = edges[e_].s;
-                        t = edges[e_].t;
-                        DAG_adj[s][DAG_deg[0][s]++] = t;
-                    }
-
-                    for (j = 0; j < T_size[i]; j++) {
-                        u = T[e][j];
-                        // sorted array for SIMD usage, DAG_adj can be considered as const.
-                        sort(DAG_adj[u], DAG_adj[u] + DAG_deg[0][u]);
-                    }
-
-                    EBBkC_plus(l - 2, cliques);
-                }
-
-                for (j = 0; j < T_size[e]; j++) {
-                    u = T[e][j];
-                    used[K][col[u]] = false;
-                }
-            }
-        }
-
-        return;
-    }
-
-    if (l == 1) {
-        for (i = 0; i < sub_v_size[l]; i++) {
-            (*cliques)++;
-        }
-
-        return;
-    }
-
-    for (i = 0; i < sub_v_size[l]; i++) {
-        u = sub_v[l][i];
-
-        if (col[u] < l) continue;
-
-        sub_v_size[l - 1] = intersect_simd4x(sub_v[l], sub_v_size[l], DAG_adj[u], DAG_deg[0][u], sub_v[l - 1]);
-
-        if (l == 2) {
-            for (j = 0; j < sub_v_size[l - 1]; j++) {
-                (*cliques)++;
-            }
-        }
-
-        else {
-            if (sub_v_size[l - 1] >= l - 1) {
-                EBBkC_plus(l - 1, cliques);
-            }
-        }
-    }
-}
-
 
 void EBBkC_Graph_t::EBBkC_plus_plus(int l, unsigned long long *cliques) {
     int c, i, j, k, p, e, e_, u, v, w, s, t, end, dist;
 
-    if (l == K) {
+    if (sub_v_size[l] < l || sub_e_size[l] < l * (l - 1) / 2) return;
 
-        for (i = 0; i < v_size; i++) sub_v[K][sub_v_size[K]++] = i;
-
-        for (i = 0; i < e_size; i++) sub_e[K][sub_e_size[K]++] = i;
-
-        if (K == 3) {
-            for (i = 0; i < sub_e_size[l]; i++) {
-                e = sub_e[l][i];
-                for (j = 0; j < T_size[e]; j++) {
-                    (*cliques)++;
-                }
-            }
-        }
-        else if (K == 4) {
-            for (i = 0; i < sub_e_size[l]; i++) {
-                e = sub_e[l][i];
-                for (j = 0; j < C_size[e]; j++) {
-                    (*cliques)++;
-                }
-            }
-        }
-        else {
-            for (i = 0; i < sub_e_size[l]; i++) {
-                e = sub_e[l][i];
-
-                if (T_size[e] < l - 2 || C_size[e] < (l - 2) * (l - 3) / 2) continue;
-
-                for (j = 0; j < T_size[e]; j++) {
-                    u = T[e][j];
-                    col[u] = 0;
-                    DAG_deg[l - 2][u] = 0;
-                    G_deg[l - 2][u] = 0;
-                }
-
-                for (j = 0; j < C_size[e]; j++) {
-                    e_ = C[e][j];
-                    s = edges[e_].s;
-                    t = edges[e_].t;
-                    G_adj[s][G_deg[l - 2][s]++] = t;
-                    G_adj[t][G_deg[l - 2][t]++] = s;
-                }
-
-                auto *list = new KeyVal_t [truss_num + 1];
-                for (j = 0; j < T_size[e]; j++) {
-                    u = T[e][j];
-                    list[j].key = u;
-                    list[j].val = G_deg[l - 2][u];
-                }
-                sort(list, list + T_size[e]);
-
-                for (j = 0; j < T_size[e]; j++) {
-                    u = list[j].key;
-                    for (k = 0; k < G_deg[l - 2][u]; k++) {
-                        v = G_adj[u][k];
-                        used[K][col[v]] = true;
-                    }
-                    for (c = 1; used[K][c]; c++) ;
-                    col[u] = c;
-                    for (k = 0; k < G_deg[l - 2][u]; k++) {
-                        v = G_adj[u][k];
-                        used[K][col[v]] = false;
-                    }
-                }
-                delete [] list;
-
-                sub_v_size[l - 2] = 0;
-                dist = 0;
-
-                for (j = 0; j < T_size[e]; j++) {
-                    u = T[e][j];
-                    sub_v[l - 2][sub_v_size[l - 2]++] = u;
-                    if (!used[K][col[u]]) {
-                        used[K][col[u]] = true;
-                        dist++;
-                    }
-                }
-
-                if (dist >= l - 2) {
-                    sub_e_size[l - 2] = 0;
-                    for (j = 0; j < C_size[e]; j++) {
-                        e_ = C[e][j];
-                        sub_e[l - 2][sub_e_size[l - 2]++] = e_;
-                        s = edges[e_].s;
-                        t = edges[e_].t;
-                        edges[e_].s = (col[s] > col[t]) ? s : t;
-                        edges[e_].t = (col[s] > col[t]) ? t : s;
-                        s = edges[e_].s;
-                        t = edges[e_].t;
-
-                        DAG_adj[s][DAG_deg[l - 2][s]++] = t;
-                    }
-
-                    EBBkC_plus_plus(l - 2, cliques);
-                }
-
-                for (j = 0; j < T_size[e]; j++) {
-                    u = T[e][j];
-                    used[K][col[u]] = false;
-                }
-            }
-        }
-
+    if (K == 3) {
+        (*cliques) += sub_v_size[l];
         return;
     }
 
-    if (sub_v_size[l] < l || sub_e_size[l] < l * (l - 1) / 2) return;
+    if (K == 4) {
+        (*cliques) += sub_e_size[l];
+        return;
+    }
 
     if (l == 2) {
         for (i = 0; i < sub_v_size[l]; i++) {
@@ -874,215 +1087,6 @@ void EBBkC_Graph_t::EBBkC_plus_plus(int l, unsigned long long *cliques) {
             }
 
             EBBkC_plus_plus(l - 1, cliques);
-        }
-
-        for (j = 0; j < sub_v_size[l - 1]; j++) {
-            v = sub_v[l - 1][j];
-            lab[v] = l;
-            used[l][col[v]] = false;
-        }
-    }
-}
-
-void EBBkC_Graph_t::branch(int e, EBBkC_Graph_t* g) {
-    int c, i, j, k, p, e_, u, v, w, s, t, end, dist, l = K;
-    int *old2new = new int[v_size];
-
-    g->v_size = 0;
-    g->e_size = 0;
-    g->edges = new Edge_t[C_size[e] + 1];
-    g->new2old = vector<int>(T_size[e]);
-
-    for (i = 0; i < T_size[e]; i++) {
-        u = T[e][i];
-        old2new[u] = g->v_size;
-        g->new2old[g->v_size++] = u;
-    }
-
-    for (i = 0; i < C_size[e]; i++) {
-        e_ = C[e][i];
-        s = edges[e_].s;
-        t = edges[e_].t;
-        g->edges[g->e_size].s = old2new[s];
-        g->edges[g->e_size++].t = old2new[t];
-    }
-
-    delete [] old2new;
-
-    if (l == 3 || l == 4) return;
-
-    if (g->v_size < l - 2 || g->e_size < (l - 2) * (l - 3) / 2) {
-        g->sub_v_size[l - 2] = g->v_size;
-        g->sub_e_size[l - 2] = g->e_size;
-        return;
-    }
-
-    for (j = 0; j < g->v_size; j++) {
-        g->col[j] = 0;
-        g->DAG_deg[l - 2][j] = 0;
-        g->G_deg[l - 2][j] = 0;
-    }
-
-    for (j = 0; j < g->e_size; j++) {
-        s = g->edges[j].s;
-        t = g->edges[j].t;
-        g->G_adj[s][g->G_deg[l - 2][s]++] = t;
-        g->G_adj[t][g->G_deg[l - 2][t]++] = s;
-    }
-
-    auto *list = new KeyVal_t[truss_num + 1];
-    for (j = 0; j < g->v_size; j++) {
-        list[j].key = j;
-        list[j].val = g->G_deg[l - 2][j];
-    }
-    sort(list, list + g->v_size);
-
-    for (j = 0; j < g->v_size; j++) {
-        u = list[j].key;
-        for (k = 0; k < g->G_deg[l - 2][u]; k++) {
-            v = g->G_adj[u][k];
-            g->used[l - 2][g->col[v]] = true;
-        }
-        for (c = 1; g->used[l - 2][c]; c++);
-        g->col[u] = c;
-        for (k = 0; k < g->G_deg[l - 2][u]; k++) {
-            v = g->G_adj[u][k];
-            g->used[l - 2][g->col[v]] = false;
-        }
-    }
-    delete[] list;
-
-    g->sub_v_size[l - 2] = 0;
-
-    for (j = 0; j < g->v_size; j++) {
-        g->sub_v[l - 2][g->sub_v_size[l - 2]++] = j;
-    }
-
-    g->sub_e_size[l - 2] = 0;
-    for (j = 0; j < g->e_size; j++) {
-        g->sub_e[l - 2][g->sub_e_size[l - 2]++] = j;
-        s = g->edges[j].s;
-        t = g->edges[j].t;
-        g->edges[j].s = (g->col[s] > g->col[t]) ? s : t;
-        g->edges[j].t = (g->col[s] > g->col[t]) ? t : s;
-        s = g->edges[j].s;
-        t = g->edges[j].t;
-
-        g->DAG_adj[s][g->DAG_deg[l - 2][s]++] = t;
-    }
-
-    return;
-}
-
-void EBBkC_Graph_t::EBBkC_plus_plus_parallel(int l, unsigned long long *cliques) {
-    int c, i, j, k, p, e, e_, u, v, w, s, t, end, dist;
-
-    if (sub_v_size[l] < l || sub_e_size[l] < l * (l - 1) / 2) return;
-
-    if (K == 3) {
-        (*cliques) += v_size;
-        return;
-    }
-
-    if (K == 4) {
-        (*cliques) += e_size;
-        return;
-    }
-
-    if (l == 2) {
-        for (i = 0; i < sub_v_size[l]; i++) {
-            u = sub_v[l][i];
-
-            for (j = 0; j < DAG_deg[l][u]; j++) {
-                (*cliques)++;
-            }
-        }
-
-        return;
-    }
-
-    if (l == 3) {
-
-        for (i = 0; i < sub_v_size[l]; i++) {
-            u = sub_v[l][i];
-
-            if (col[u] < l) continue;
-
-            for (j = 0; j < DAG_deg[l][u]; j++) {
-                v = DAG_adj[u][j];
-                lab[v] = l - 1;
-            }
-
-            for (j = 0; j < DAG_deg[l][u]; j++) {
-                v = DAG_adj[u][j];
-
-                if (col[v] < l - 1) continue;
-
-                for (k = 0; k < DAG_deg[l][v]; k++) {
-                    w = DAG_adj[v][k];
-                    if (lab[w] == l - 1) (*cliques)++;
-                }
-            }
-
-            for (j = 0; j < DAG_deg[l][u]; j++) {
-                v = DAG_adj[u][j];
-                lab[v] = l;
-            }
-        }
-
-        return;
-    }
-
-    if (can_terminate(l, cliques)) {
-        return;
-    }
-
-    for (i = 0; i < sub_v_size[l]; i++) {
-        u = sub_v[l][i];
-
-        if (col[u] < l) continue;
-
-        sub_v_size[l - 1] = 0;
-        dist = 0;
-
-        for (j = 0; j < DAG_deg[l][u]; j++) {
-            v = DAG_adj[u][j];
-            lab[v] = l - 1;
-            sub_v[l - 1][sub_v_size[l - 1]++] = v;
-            DAG_deg[l - 1][v] = 0;
-            G_deg[l - 1][v] = 0;
-
-            if (!used[l][col[v]]) {
-                used[l][col[v]] = true;
-                dist++;
-            }
-        }
-
-        if (dist >= l - 1) {
-
-            sub_e_size[l - 1] = 0;
-            for (j = 0; j < sub_v_size[l - 1]; j++) {
-                v = sub_v[l - 1][j];
-
-                end = DAG_deg[l][v];
-                for (k = 0; k < end; k++) {
-                    w = DAG_adj[v][k];
-                    if (lab[w] == l - 1) {
-                        DAG_deg[l - 1][v]++;
-                        sub_e_size[l - 1]++;
-
-                        // just for early-termination
-                        G_deg[l - 1][v]++;
-                        G_deg[l - 1][w]++;
-
-                    } else {
-                        DAG_adj[v][k--] = DAG_adj[v][--end];
-                        DAG_adj[v][end] = w;
-                    }
-                }
-            }
-
-            EBBkC_plus_plus_parallel(l - 1, cliques);
         }
 
         for (j = 0; j < sub_v_size[l - 1]; j++) {
@@ -1222,24 +1226,24 @@ bool EBBkC_Graph_t::can_terminate(int l, unsigned long long *cliques) {
 }
 
 
-double EBBkC_t::truss_order(const char *r_file_name, const char *w_file_name) {
-    double runtime;
-    struct rusage start, end;
-    EBBkC_Graph_t G;
-
-    GetCurTime(&start);
-    G.read_edges_from_file(r_file_name);
-    G.truss_decompose(w_file_name);
-    GetCurTime(&end);
-    runtime = GetTime(&start, &end);
-
-    return runtime;
-}
+//double EBBkC_t::truss_order(const char *r_file_name, const char *w_file_name) {
+//    double runtime;
+//    struct rusage start, end;
+//    EBBkC_Graph_t G;
+//
+//    GetCurTime(&start);
+//    G.read_edges_from_file(r_file_name);
+//    G.truss_decompose(w_file_name);
+//    GetCurTime(&end);
+//    runtime = GetTime(&start, &end);
+//
+//    return runtime;
+//}
 
 double EBBkC_t::list_k_clique(const char *file_name) {
     double runtime;
     struct rusage start, end;
-    EBBkC_Graph_t G;
+    EBBkC_Graph_t G, g;
 
     printf("Reading edges from %s ...\n", file_name);
     G.read_ordered_edges_from_file(file_name);
@@ -1250,7 +1254,13 @@ double EBBkC_t::list_k_clique(const char *file_name) {
     printf("Iterate over all cliques\n");
 
     GetCurTime(&start);
-    G.EBBkC_plus_plus(K, &N);
+    g.truss_num = G.truss_num;
+    g.build(true);
+    for (int i = 0; i < G.e_size; i++) {
+        G.branch(i, &g);
+        g.EBBkC_plus_plus(K - 2, &N);
+    }
+
     GetCurTime(&end);
     runtime = GetTime(&start, &end);
 
@@ -1281,7 +1291,7 @@ double EBBkC_t::list_k_clique_parallel(const char *file_name) {
 #pragma omp for schedule(dynamic, 1) nowait
         for (i = 0; i < G.e_size; i++) {
             G.branch(i, &g);
-            g.EBBkC_plus_plus_parallel(K - 2, &N);
+            g.EBBkC_plus_plus(K - 2, &N);
             n_edges++;
         }
         double end = omp_get_wtime();

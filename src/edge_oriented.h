@@ -59,16 +59,16 @@ public:
     ~EBBkC_Graph_t();
 
     void read_edges_from_file(const char* file_name);
-    void truss_decompose(const char* w_file_name);
+//    void truss_decompose(const char* w_file_name);
     void read_ordered_edges_from_file(const char* file_name);
     void build(bool sub);
 
-    void EBBkC(int l, unsigned long long *cliques);
-    void EBBkC_plus(int, unsigned long long *cliques);
-    void EBBkC_plus_plus(int l, unsigned long long *cliques);
+//    void EBBkC(int l, unsigned long long *cliques);
+//    void EBBkC_plus(int, unsigned long long *cliques);
+//    void EBBkC_plus_plus(int l, unsigned long long *cliques);
 
     void branch(int e, EBBkC_Graph_t* g);
-    void EBBkC_plus_plus_parallel(int l, unsigned long long *cliques);
+    void EBBkC_plus_plus(int l, unsigned long long *cliques);
 
     bool can_terminate(int l, unsigned long long* cliques);
     void list_in_plex(int start, int p, int q, unsigned long long* cliques);

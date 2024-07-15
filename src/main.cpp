@@ -29,8 +29,8 @@ int main(int argc, char** argv) {
         string prefix = src_filename.substr(0, src_filename.find_last_of('.'));
         string clean_filename = prefix + ".clean";
         clean_edges(src_filename.c_str(), clean_filename.c_str());
-        string index_filename = prefix + ".index";
-        runtime = EBBkC_t::truss_order(clean_filename.c_str(), index_filename.c_str());
+//        string index_filename = prefix + ".index";
+//        runtime = EBBkC_t::truss_order(clean_filename.c_str(), index_filename.c_str());
         printf("Pre-processed in %.2lf ms\n\n", runtime);
     }
 
