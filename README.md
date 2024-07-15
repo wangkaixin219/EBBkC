@@ -18,7 +18,7 @@ cmake ..
 make
 ```
 
-After running the codes, there will be an executable file called `BBkC`, which means you have already compiled our codes. 
+After running the codes, there will be two executable files: one is called `BBkC` and the other is called `truss`, which means you have already compiled our codes. 
 
 ## Step 1 - Pre-processing Procedure
 
@@ -52,7 +52,9 @@ Pre-process ../../dataset/nasasrb.edges
 Pre-processed in 4535.87 ms
 ```
 
-The pre-processing procedure will output two files with the prefix same as the original file but end with `.clean` and `.index`, respectively. We will use the `.index` file for the listing procedure. 
+The pre-processing procedure will output a file with the prefix same as the original file but end with `.clean`. 
+
+We will use the `.index` file for the listing procedure. 
 
 ## Step 2 - Serial Listing Procedure
 
