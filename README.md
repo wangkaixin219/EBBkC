@@ -54,7 +54,7 @@ Pre-processed in 4535.87 ms
 
 The pre-processing procedure will output two files with the prefix same as the original file but end with `.clean` and `.index`, respectively. We will use the `.index` file for the listing procedure. 
 
-## Step 2 - Listing Procedure
+## Step 2 - Serial Listing Procedure
 
 To list $k$-cliques in the graph, we need to specify the value of $k$. In addition, we also need to specify a value of $t$ to control when we should conduct the early termination (details can be found in our paper). Therefore, the running command is: 
 
@@ -93,3 +93,44 @@ Number of 12-cliques: 7905736209
 EBBkC+ET (t = 2) runtime 12683.40 ms
 ```
 
+## Step 3 - Parallel Listing Procedure
+
+To list $k$-cliques in the graph with multiple threads, we need to specify an additional parameter to indicate the number of threads to be used. Therefore, the running command is: 
+
+```bash
+./BBkC ep /PATH_TO_INDEX_DATA k_val t_val p_val
+```
+
+For example, 
+
+```bash
+./BBkC ep ../../dataset/nasasrb.index 12 3 16   # list 12-clique in `nasasrb` with early-termination in 3-plex with 16 threads
+```
+
+It should outputs
+
+```
+Reading edges from ../../dataset/nasasrb.index ...
+|V| = 54567, |E| = 1299405
+Truss number = 23
+Building necessary data structure ...
+Iterate over all cliques
+Thread: 9, Runtime = 881.88 ms, handled 80552 edges
+Thread: 2, Runtime = 881.33 ms, handled 82149 edges
+Thread: 10, Runtime = 881.87 ms, handled 83261 edges
+Thread: 12, Runtime = 881.31 ms, handled 80916 edges
+Thread: 13, Runtime = 881.61 ms, handled 82643 edges
+Thread: 0, Runtime = 881.96 ms, handled 87243 edges
+Thread: 15, Runtime = 881.17 ms, handled 73071 edges
+Thread: 1, Runtime = 881.66 ms, handled 80179 edges
+Thread: 5, Runtime = 881.73 ms, handled 76805 edges
+Thread: 7, Runtime = 881.75 ms, handled 80162 edges
+Thread: 8, Runtime = 882.12 ms, handled 79822 edges
+Thread: 14, Runtime = 881.33 ms, handled 81962 edges
+Thread: 3, Runtime = 881.80 ms, handled 82818 edges
+Thread: 11, Runtime = 881.95 ms, handled 81079 edges
+Thread: 6, Runtime = 881.88 ms, handled 83730 edges
+Thread: 4, Runtime = 882.28 ms, handled 83013 edges
+Number of 12-cliques: 7905736209
+EBBkC+ET (t = 3) runtime 882.28 ms
+```
