@@ -105,7 +105,7 @@ void PKT_processSubLevel_intersection_handling_skew(graph_t *g, eid_t *curr,
 
 /**   Computes the support of each edge in parallel
  *    Computes k-truss in parallel   ****/
-void PKT_intersection(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge) {
+int PKT_intersection(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge) {
     IterHelper iter_helper(g, &EdgeSupport, &edgeIdToEdge);
     auto process_functor = [&iter_helper, g](int level) {
         PKT_processSubLevel_intersection_handling_skew(g, iter_helper.curr_, iter_helper.in_curr_,
@@ -117,5 +117,7 @@ void PKT_intersection(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge) {
                                                        iter_helper.is_vertex_updated_, iter_helper);
     };
     AbstractPKT(g, EdgeSupport, edgeIdToEdge, iter_helper, process_functor);
+
+    return iter_helper.level_size_ + 2;
 }
 

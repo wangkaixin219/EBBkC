@@ -58,9 +58,9 @@ public:
     EBBkC_Graph_t();
     ~EBBkC_Graph_t();
 
-    void read_edges_from_file(const char* file_name);
-//    void truss_decompose(const char* w_file_name);
-    void read_ordered_edges_from_file(const char* file_name);
+//    void read_edges_from_file(const char* file_name);
+    void truss_decompose(const char* w_file_name);
+//    void read_ordered_edges_from_file(const char* file_name);
     void build(bool sub);
 
 //    void EBBkC(int l, unsigned long long *cliques);
@@ -77,7 +77,7 @@ public:
 
 class EBBkC_t {
 public:
-    static double truss_order(const char* r_file_name, const char* w_file_name);
+//    static double truss_order(const char* r_file_name, const char* w_file_name);
     static double list_k_clique(const char* file_name);
     static double list_k_clique_parallel(const char* file_name);
 };

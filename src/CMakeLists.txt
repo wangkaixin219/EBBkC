@@ -54,23 +54,28 @@ target_compile_definitions(graph-pre-processing-legacy PRIVATE NAVIE_SERIAL_CONS
 add_library(graph-pre-processing truss/util/graph/graph_preprocessing.cpp)
 
 
-function(build_truss_algorithm name macros files)
-    add_executable(${name} ${files} truss/decompose/main.cpp truss/decompose/iter_helper.cpp truss/decompose/pkt_tri_cnt_intermediate.cpp)
-    target_link_libraries(${name} PRIVATE graph-pre-processing)
+#function(build_truss_algorithm name macros files)
+#    add_executable(${name} ${files} truss/decompose/main.cpp truss/decompose/iter_helper.cpp truss/decompose/pkt_tri_cnt_intermediate.cpp)
+#    target_link_libraries(${name} PRIVATE graph-pre-processing)
+#
+#    target_compile_definitions(${name} PRIVATE ${macros})
+#    target_compile_definitions(${name} PRIVATE "BMP_PROCESSED=1")
+#    target_compile_definitions(${name} PRIVATE "BMP_QUEUE=1")
+#    #    target_compile_definitions(${name} PRIVATE "LOCAL_STAT=1") # switch off when do not collect local stat
+#    #    target_compile_definitions(${name} PRIVATE "SUP_STAT=1") # switch off when do not collect local stat
+#endfunction()
 
-    target_compile_definitions(${name} PRIVATE ${macros})
-    target_compile_definitions(${name} PRIVATE "BMP_PROCESSED=1")
-    target_compile_definitions(${name} PRIVATE "BMP_QUEUE=1")
-    #    target_compile_definitions(${name} PRIVATE "LOCAL_STAT=1") # switch off when do not collect local stat
-    #    target_compile_definitions(${name} PRIVATE "SUP_STAT=1") # switch off when do not collect local stat
-endfunction()
+#build_truss_algorithm(truss "PKT_INTER=1" truss/decompose/pkt_merge.cpp)    ### Add BUCKET_BMP
+#target_compile_definitions(truss PRIVATE "DISABLE_BUCKET_OPT=1;BUCKET_BMP=1")
 
-build_truss_algorithm(truss "PKT_INTER=1" truss/decompose/pkt_merge.cpp)    ### Add BUCKET_BMP
-target_compile_definitions(truss PRIVATE "DISABLE_BUCKET_OPT=1;BUCKET_BMP=1")
+add_executable(BBkC main.cpp def.cpp def.h edge_oriented.cpp edge_oriented.h set_operation.cpp set_operation.h
+        truss/decompose/pkt_merge.cpp truss/decompose/iter_helper.cpp truss/decompose/pkt_tri_cnt_intermediate.cpp)
+target_link_libraries(BBkC PRIVATE graph-pre-processing)
+target_compile_definitions(BBkC PRIVATE "DISABLE_BUCKET_OPT=1;BUCKET_BMP=1;BMP_PROCESSED=1;BMP_QUEUE=1")
 
-add_executable(BBkC main.cpp def.cpp def.h edge_oriented.cpp edge_oriented.h set_operation.cpp set_operation.h)
-
-
+#target_compile_definitions(${name} PRIVATE ${macros})
+#target_compile_definitions(${name} PRIVATE "BMP_PROCESSED=1")
+#target_compile_definitions(${name} PRIVATE "BMP_QUEUE=1")
 
 
 

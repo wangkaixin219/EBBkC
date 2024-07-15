@@ -36,8 +36,8 @@ int main(int argc, char** argv) {
 
     else if (act == "e") {                      // EBBkC+ET
         string src_filename(argv[2]);
-        string suffix = src_filename.substr(src_filename.find_last_of('.'));
-        if (suffix != ".index") exit(0);
+//        string suffix = src_filename.substr(src_filename.find_last_of('.'));
+//        if (suffix != ".index") exit(0);
 
         K = atoi(argv[3]);
         L = atoi(argv[4]);
@@ -49,8 +49,8 @@ int main(int argc, char** argv) {
 
     else if (act == "ep") {                      // EBBkC+ET (parallel)
         string src_filename(argv[2]);
-        string suffix = src_filename.substr(src_filename.find_last_of('.'));
-        if (suffix != ".index") exit(0);
+//        string suffix = src_filename.substr(src_filename.find_last_of('.'));
+//        if (suffix != ".index") exit(0);
 
         K = atoi(argv[3]);
         L = atoi(argv[4]);

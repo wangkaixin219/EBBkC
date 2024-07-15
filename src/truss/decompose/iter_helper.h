@@ -373,4 +373,4 @@ void AbstractPKT(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge, IterHelper 
 #endif
 }
 
-void PKT_intersection(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge);
+int PKT_intersection(graph_t *g, int *&EdgeSupport, Edge *&edgeIdToEdge);

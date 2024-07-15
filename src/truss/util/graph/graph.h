@@ -93,7 +93,7 @@ struct Graph {
 
     vector<int> degree;
 
-    explicit Graph(char *dir_cstr);
+    explicit Graph(const char *dir_cstr);
 
 public:
     void ReadDegree();

@@ -35,7 +35,7 @@ double timer() {
     return ((double) (tp.tv_sec) + tp.tv_usec * 1e-6);
 }
 
-Graph::Graph(char *dir_cstr) {
+Graph::Graph(const char *dir_cstr) {
     dir = string(dir_cstr);
 
     ReadDegree();

@@ -1,9 +1,18 @@
-#include "edge_oriented.h"
 #include <set>
 #include <algorithm>
 #include <unordered_map>
-#include "set_operation.h"
 #include <omp.h>
+#include <cassert>
+#include <chrono>
+
+#include "set_operation.h"
+#include "edge_oriented.h"
+#include "truss/util/graph/graph.h"
+#include "truss/util/log/log.h"
+#include "truss/util/timer.h"
+#include "truss/decompose/parallel_all_edge_cnc.h"
+#include "truss/util/reordering/reorder_utils.h"
+#include "truss/decompose/iter_helper.h"
 
 extern const int K, L;
 extern unsigned long long N;
@@ -109,135 +118,135 @@ EBBkC_Graph_t::~EBBkC_Graph_t() {
     delete [] loc;
 }
 
-void EBBkC_Graph_t::read_edges_from_file(const char *file_name) {
-    FILE *fp;
-    if ((fp = fopen(file_name, "r")) == nullptr) {
-        printf("Cannot open file %s.\n", file_name);
-        exit(0);
-    }
-
-    Edge_t e;
-    int u, v, i;
-    int *old2new = new int [N_NODES];
-    for (i = 0; i < N_NODES; i++) old2new[i] = -1;
-
-    e_size = 0;
-    edges = new Edge_t [N_EDGES];
-
-    while (fscanf(fp, "%d %d%*[^\n]%*c", &u, &v) == 2) {
-
-        if (u > N_NODES || v > N_NODES) {
-            printf("Enlarge N_NODES to at least %u.\n", (u > v ? u : v));
-            exit(0);
-        }
-        if (old2new[u] == -1) {
-            old2new[u] = (int) new2old.size();
-            new2old.push_back(u);
-        }
-        if (old2new[v] == -1) {
-            old2new[v] = (int) new2old.size();
-            new2old.push_back(v);
-        }
-
-        e = Edge_t(old2new[u], old2new[v], false);
-        edges[e_size++] = e;
-    }
-
-    v_size = (int) new2old.size();
-
-    fclose(fp);
-
-    delete [] old2new;
-}
-
-void EBBkC_Graph_t::read_ordered_edges_from_file(const char *file_name) {
-    FILE *fp;
-    if ((fp = fopen(file_name, "r")) == nullptr) {
-        printf("Cannot open file %s.\n", file_name);
-        exit(0);
-    }
-
-    Edge_t e, e_;
-    int u, v, w, i, j, k, idx, edge_rank, edge_sub_size;
-    int *old2new = new int [N_NODES];
-    for (i = 0; i < N_NODES; i++) old2new[i] = -1;
-    vector<int> t_;
-    vector<vector<int>> T_;
-
-    e_size = 0;
-    edges = new Edge_t [N_EDGES];
-
-    while (fscanf(fp, "%d %d %d %d %d", &u, &v, &k, &edge_rank, &edge_sub_size) == 5) {
-
-        if (k <= K) {
-            fscanf(fp, "%*[^\n]%*c");
-            continue;
-        }
-        truss_num = truss_num > k ? truss_num : k;
-
-        if (u > N_NODES || v > N_NODES) {
-            printf("Enlarge N_NODES to at least %u.\n", (u > v ? u : v));
-            exit(0);
-        }
-        if (old2new[u] == -1) {
-            old2new[u] = (int) new2old.size();
-            new2old.push_back(u);
-        }
-        if (old2new[v] == -1) {
-            old2new[v] = (int) new2old.size();
-            new2old.push_back(v);
-        }
-
-        e = Edge_t(old2new[u], old2new[v], false);
-        rank.push_back(edge_rank);
-        edge2id.insert(e, e_size);
-        edges[e_size++] = e;
-
-        for (j = 0; j < edge_sub_size; j++) {
-            fscanf(fp, "%d", &w);
-            if (old2new[w] == -1) {
-                old2new[w] = (int) new2old.size();
-                new2old.push_back(w);
-            }
-            t_.push_back(old2new[w]);
-        }
-        T_.push_back(t_);
-        t_.clear();
-    }
-
-    v_size = (int) new2old.size();
-
-    T = new int* [e_size];
-    for (i = 0; i < e_size; i++) T[i] = new int [truss_num + 1];
-    T_size = new int [e_size];
-
-    C = new int* [e_size];
-    for (i = 0; i < e_size; i++) C[i] = new int [T_[i].size() * (T_[i].size() - 1) / 2];
-    C_size = new int [e_size];
-
-    for (i = 0; i < e_size; i++) {
-        T_size[i] = C_size[i] = 0;
-
-        for (j = 0; j < T_[i].size(); j++) T[i][T_size[i]++] = T_[i][j];
-
-        for (j = 0; j < T_size[i]; j++) {
-            for (k = j + 1; k < T_size[i]; k++) {
-
-                e = Edge_t(T[i][j], T[i][k], false);
-
-                if ((idx = edge2id.exist(e)) != -1  && rank[idx] > rank[i]) {
-                    C[i][C_size[i]++] = idx;
-                }
-            }
-        }
-    }
-
-    printf("|V| = %d, |E| = %d\n", v_size, e_size);
-    printf("Truss number = %d\n", truss_num - 2);
-
-    fclose(fp);
-    delete [] old2new;
-}
+//void EBBkC_Graph_t::read_edges_from_file(const char *file_name) {
+//    FILE *fp;
+//    if ((fp = fopen(file_name, "r")) == nullptr) {
+//        printf("Cannot open file %s.\n", file_name);
+//        exit(0);
+//    }
+//
+//    Edge_t e;
+//    int u, v, i;
+//    int *old2new = new int [N_NODES];
+//    for (i = 0; i < N_NODES; i++) old2new[i] = -1;
+//
+//    e_size = 0;
+//    edges = new Edge_t [N_EDGES];
+//
+//    while (fscanf(fp, "%d %d%*[^\n]%*c", &u, &v) == 2) {
+//
+//        if (u > N_NODES || v > N_NODES) {
+//            printf("Enlarge N_NODES to at least %u.\n", (u > v ? u : v));
+//            exit(0);
+//        }
+//        if (old2new[u] == -1) {
+//            old2new[u] = (int) new2old.size();
+//            new2old.push_back(u);
+//        }
+//        if (old2new[v] == -1) {
+//            old2new[v] = (int) new2old.size();
+//            new2old.push_back(v);
+//        }
+//
+//        e = Edge_t(old2new[u], old2new[v], false);
+//        edges[e_size++] = e;
+//    }
+//
+//    v_size = (int) new2old.size();
+//
+//    fclose(fp);
+//
+//    delete [] old2new;
+//}
+//
+//void EBBkC_Graph_t::read_ordered_edges_from_file(const char *file_name) {
+//    FILE *fp;
+//    if ((fp = fopen(file_name, "r")) == nullptr) {
+//        printf("Cannot open file %s.\n", file_name);
+//        exit(0);
+//    }
+//
+//    Edge_t e, e_;
+//    int u, v, w, i, j, k, idx, edge_rank, edge_sub_size;
+//    int *old2new = new int [N_NODES];
+//    for (i = 0; i < N_NODES; i++) old2new[i] = -1;
+//    vector<int> t_;
+//    vector<vector<int>> T_;
+//
+//    e_size = 0;
+//    edges = new Edge_t [N_EDGES];
+//
+//    while (fscanf(fp, "%d %d %d %d %d", &u, &v, &k, &edge_rank, &edge_sub_size) == 5) {
+//
+//        if (k <= K) {
+//            fscanf(fp, "%*[^\n]%*c");
+//            continue;
+//        }
+//        truss_num = truss_num > k ? truss_num : k;
+//
+//        if (u > N_NODES || v > N_NODES) {
+//            printf("Enlarge N_NODES to at least %u.\n", (u > v ? u : v));
+//            exit(0);
+//        }
+//        if (old2new[u] == -1) {
+//            old2new[u] = (int) new2old.size();
+//            new2old.push_back(u);
+//        }
+//        if (old2new[v] == -1) {
+//            old2new[v] = (int) new2old.size();
+//            new2old.push_back(v);
+//        }
+//
+//        e = Edge_t(old2new[u], old2new[v], false);
+//        rank.push_back(edge_rank);
+//        edge2id.insert(e, e_size);
+//        edges[e_size++] = e;
+//
+//        for (j = 0; j < edge_sub_size; j++) {
+//            fscanf(fp, "%d", &w);
+//            if (old2new[w] == -1) {
+//                old2new[w] = (int) new2old.size();
+//                new2old.push_back(w);
+//            }
+//            t_.push_back(old2new[w]);
+//        }
+//        T_.push_back(t_);
+//        t_.clear();
+//    }
+//
+//    v_size = (int) new2old.size();
+//
+//    T = new int* [e_size];
+//    for (i = 0; i < e_size; i++) T[i] = new int [truss_num + 1];
+//    T_size = new int [e_size];
+//
+//    C = new int* [e_size];
+//    for (i = 0; i < e_size; i++) C[i] = new int [T_[i].size() * (T_[i].size() - 1) / 2];
+//    C_size = new int [e_size];
+//
+//    for (i = 0; i < e_size; i++) {
+//        T_size[i] = C_size[i] = 0;
+//
+//        for (j = 0; j < T_[i].size(); j++) T[i][T_size[i]++] = T_[i][j];
+//
+//        for (j = 0; j < T_size[i]; j++) {
+//            for (k = j + 1; k < T_size[i]; k++) {
+//
+//                e = Edge_t(T[i][j], T[i][k], false);
+//
+//                if ((idx = edge2id.exist(e)) != -1  && rank[idx] > rank[i]) {
+//                    C[i][C_size[i]++] = idx;
+//                }
+//            }
+//        }
+//    }
+//
+//    printf("|V| = %d, |E| = %d\n", v_size, e_size);
+//    printf("Truss number = %d\n", truss_num - 2);
+//
+//    fclose(fp);
+//    delete [] old2new;
+//}
 //
 //void EBBkC_Graph_t::truss_decompose(const char* w_file_name) {
 //
@@ -1225,20 +1234,140 @@ bool EBBkC_Graph_t::can_terminate(int l, unsigned long long *cliques) {
     return true;
 }
 
+void EBBkC_Graph_t::truss_decompose(const char *dir) {
+    graph_t g;
 
-//double EBBkC_t::truss_order(const char *r_file_name, const char *w_file_name) {
-//    double runtime;
-//    struct rusage start, end;
-//    EBBkC_Graph_t G;
-//
-//    GetCurTime(&start);
-//    G.read_edges_from_file(r_file_name);
-//    G.truss_decompose(w_file_name);
-//    GetCurTime(&end);
-//    runtime = GetTime(&start, &end);
-//
-//    return runtime;
-//}
+    //load the graph from file
+    Graph G(dir);
+    g.adj = G.edge_dst;
+    g.num_edges = G.node_off;
+    g.n = G.nodemax;
+    g.m = G.edgemax;
+
+    string reorder_method("core");
+
+    vector <int32_t> new_vid_dict;
+    vector <int32_t> old_vid_dict;
+    ReorderWrapper(g, dir, reorder_method, new_vid_dict, old_vid_dict);
+
+    //edge list array
+    Timer get_eid_timer;
+
+    Edge *edgeIdToEdge = (Edge *) malloc((g.m / 2) * sizeof(Edge));
+    assert(edgeIdToEdge != nullptr);
+    log_info("Malloc Time: %.9lf s", get_eid_timer.elapsed());
+    get_eid_timer.reset();
+
+    //Populate the edge list array
+    getEidAndEdgeList(&g, edgeIdToEdge);
+    log_info("Init Eid Time: %.9lf s", get_eid_timer.elapsed());
+    get_eid_timer.reset();
+
+    int *EdgeSupport = (int *) malloc(g.m / 2 * sizeof(int));
+    assert(EdgeSupport != nullptr);
+
+    auto max_omp_threads = omp_get_max_threads();
+    omp_set_num_threads(max_omp_threads / 2);
+    log_info("Max Threads: %d", max_omp_threads);
+#pragma omp parallel for
+    for (auto i = 0; i < max_omp_threads; i++) {
+        auto avg = g.m / 2 / max_omp_threads;
+        auto iter_beg = avg * i;
+        auto iter_end = (i == max_omp_threads - 1) ? g.m / 2 : avg * (i + 1);
+        memset(EdgeSupport + iter_beg, 0, (iter_end - iter_beg) * sizeof(int));
+    }
+    log_info("Init EdgeSupport Time: %.9lf s", get_eid_timer.elapsed());
+    get_eid_timer.reset();
+
+    Timer global_timer;
+    truss_num = PKT_intersection(&g, EdgeSupport, edgeIdToEdge);
+
+#pragma omp single
+    {
+        int u, v, w;
+        int *old2new = new int[N_NODES];
+        for (int i = 0; i < N_NODES; i++) old2new[i] = -1;
+
+        e_size = 0;
+        edges = new Edge_t[g.m / 2];
+
+        T = new int *[g.m / 2];
+        T_size = new int[g.m / 2];
+
+        for (int i = 0; i < g.m / 2; i++) {
+            if (g.edge_truss[i] <= K) continue;
+
+            Edge e = edgeIdToEdge[i];
+            u = e.u;
+            v = e.v;
+
+            if (old2new[u] == -1) {
+                old2new[u] = (int) new2old.size();
+                new2old.push_back(u);
+            }
+
+            if (old2new[v] == -1) {
+                old2new[v] = (int) new2old.size();
+                new2old.push_back(v);
+            }
+
+            edges[e_size] = Edge_t(old2new[u], old2new[v], false);
+            edge2id.insert(edges[e_size], e_size);
+            rank.push_back(g.edge_rank[i]);
+
+            int sz = g.v_set[i].size();
+            T_size[e_size] = sz;
+
+            T[e_size] = new int[truss_num + 1];
+            for (int j = 0; j < sz; j++) {
+                int w = g.v_set[i][j];
+
+                if (old2new[w] == -1) {
+                    old2new[w] = (int) new2old.size();
+                    new2old.push_back(w);
+                }
+
+                T[e_size][j] = old2new[w];
+            }
+
+            e_size++;
+        }
+
+        C = new int *[e_size];
+        C_size = new int[e_size];
+
+        for (int i = 0; i < e_size; i++) {
+
+            C_size[i] = 0;
+            int sz = T_size[i];
+            C[i] = new int[sz * (sz - 1) / 2];
+
+            for (int j = 0; j < T_size[i]; j++) {
+                for (int k = j + 1; k < T_size[i]; k++) {
+
+                    Edge_t e = Edge_t(T[i][j], T[i][k], false);
+                    int idx = edge2id.exist(e);
+
+                    if (idx != -1 && rank[idx] > rank[i]) {
+                        C[i][C_size[i]++] = idx;
+                    }
+                }
+            }
+        }
+    };
+
+    v_size = new2old.size();
+
+    printf("|V| = %d, |E| = %d\n", v_size, e_size);
+    printf("Truss number = %d\n", truss_num - 2);
+
+    //Free memory
+    free_graph(&g);
+    free(edgeIdToEdge);
+    free(EdgeSupport);
+
+}
+
 
 double EBBkC_t::list_k_clique(const char *file_name) {
     double runtime;
@@ -1246,14 +1375,14 @@ double EBBkC_t::list_k_clique(const char *file_name) {
     EBBkC_Graph_t G, g;
 
     printf("Reading edges from %s ...\n", file_name);
-    G.read_ordered_edges_from_file(file_name);
+    GetCurTime(&start);
+    G.truss_decompose(file_name);
 
     printf("Building necessary data structure ...\n");
     G.build(false);
 
     printf("Iterate over all cliques\n");
 
-    GetCurTime(&start);
     g.truss_num = G.truss_num;
     g.build(true);
     for (int i = 0; i < G.e_size; i++) {
@@ -1275,7 +1404,8 @@ double EBBkC_t::list_k_clique_parallel(const char *file_name) {
     EBBkC_Graph_t G, g;
 
     printf("Reading edges from %s ...\n", file_name);
-    G.read_ordered_edges_from_file(file_name);
+    start = omp_get_wtime();
+    G.truss_decompose(file_name);
 
     printf("Building necessary data structure ...\n");
     G.build(false);
@@ -1285,7 +1415,6 @@ double EBBkC_t::list_k_clique_parallel(const char *file_name) {
 #pragma omp parallel private(g, start, end, n_edges, i) reduction(+:N) reduction(max:runtime)
     {
         n_edges = 0;
-        start = omp_get_wtime();
         g.truss_num = G.truss_num;
         g.build(true);
 #pragma omp for schedule(dynamic, 1) nowait
