@@ -1,0 +1,82 @@
+[
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/common-utils.dir/truss/util/reordering/reorder_utils.cpp.o -c /home/kaixin/EBBkC/src/truss/util/reordering/reorder_utils.cpp",
+  "file": "/home/kaixin/EBBkC/src/truss/util/reordering/reorder_utils.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/common-utils.dir/truss/util/reordering/pkc_reorder.cpp.o -c /home/kaixin/EBBkC/src/truss/util/reordering/pkc_reorder.cpp",
+  "file": "/home/kaixin/EBBkC/src/truss/util/reordering/pkc_reorder.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/common-utils.dir/truss/util/graph/graph.cpp.o -c /home/kaixin/EBBkC/src/truss/util/graph/graph.cpp",
+  "file": "/home/kaixin/EBBkC/src/truss/util/graph/graph.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/common-utils.dir/truss/util/log/log.cpp.o -c /home/kaixin/EBBkC/src/truss/util/log/log.cpp",
+  "file": "/home/kaixin/EBBkC/src/truss/util/log/log.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/common-utils.dir/truss/util/md5.cpp.o -c /home/kaixin/EBBkC/src/truss/util/md5.cpp",
+  "file": "/home/kaixin/EBBkC/src/truss/util/md5.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/common-utils.dir/truss/util/search/search_util.cpp.o -c /home/kaixin/EBBkC/src/truss/util/search/search_util.cpp",
+  "file": "/home/kaixin/EBBkC/src/truss/util/search/search_util.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/common-utils.dir/truss/decompose/extern_variables.cpp.o -c /home/kaixin/EBBkC/src/truss/decompose/extern_variables.cpp",
+  "file": "/home/kaixin/EBBkC/src/truss/decompose/extern_variables.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DNAVIE_SERIAL_CONSTRUCT=1 -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/graph-pre-processing-legacy.dir/truss/util/graph/graph_preprocessing.cpp.o -c /home/kaixin/EBBkC/src/truss/util/graph/graph_preprocessing.cpp",
+  "file": "/home/kaixin/EBBkC/src/truss/util/graph/graph_preprocessing.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/graph-pre-processing.dir/truss/util/graph/graph_preprocessing.cpp.o -c /home/kaixin/EBBkC/src/truss/util/graph/graph_preprocessing.cpp",
+  "file": "/home/kaixin/EBBkC/src/truss/util/graph/graph_preprocessing.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DBMP_PROCESSED=1 -DBMP_QUEUE=1 -DBUCKET_BMP=1 -DDISABLE_BUCKET_OPT=1 -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/BBkC.dir/main.cpp.o -c /home/kaixin/EBBkC/src/main.cpp",
+  "file": "/home/kaixin/EBBkC/src/main.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DBMP_PROCESSED=1 -DBMP_QUEUE=1 -DBUCKET_BMP=1 -DDISABLE_BUCKET_OPT=1 -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/BBkC.dir/def.cpp.o -c /home/kaixin/EBBkC/src/def.cpp",
+  "file": "/home/kaixin/EBBkC/src/def.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DBMP_PROCESSED=1 -DBMP_QUEUE=1 -DBUCKET_BMP=1 -DDISABLE_BUCKET_OPT=1 -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/BBkC.dir/edge_oriented.cpp.o -c /home/kaixin/EBBkC/src/edge_oriented.cpp",
+  "file": "/home/kaixin/EBBkC/src/edge_oriented.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DBMP_PROCESSED=1 -DBMP_QUEUE=1 -DBUCKET_BMP=1 -DDISABLE_BUCKET_OPT=1 -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/BBkC.dir/set_operation.cpp.o -c /home/kaixin/EBBkC/src/set_operation.cpp",
+  "file": "/home/kaixin/EBBkC/src/set_operation.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DBMP_PROCESSED=1 -DBMP_QUEUE=1 -DBUCKET_BMP=1 -DDISABLE_BUCKET_OPT=1 -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/BBkC.dir/truss/decompose/pkt_merge.cpp.o -c /home/kaixin/EBBkC/src/truss/decompose/pkt_merge.cpp",
+  "file": "/home/kaixin/EBBkC/src/truss/decompose/pkt_merge.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DBMP_PROCESSED=1 -DBMP_QUEUE=1 -DBUCKET_BMP=1 -DDISABLE_BUCKET_OPT=1 -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/BBkC.dir/truss/decompose/iter_helper.cpp.o -c /home/kaixin/EBBkC/src/truss/decompose/iter_helper.cpp",
+  "file": "/home/kaixin/EBBkC/src/truss/decompose/iter_helper.cpp"
+},
+{
+  "directory": "/home/kaixin/EBBkC/src/cmake-build-debug",
+  "command": "/usr/bin/c++ -DBMP_PROCESSED=1 -DBMP_QUEUE=1 -DBUCKET_BMP=1 -DDISABLE_BUCKET_OPT=1 -DTIME_RESULTS -DUSE_LOG -I/home/kaixin/EBBkC/src/truss/dependencies/sparsepp -I/home/kaixin/EBBkC/src/truss/dependencies/libpopcnt -I/home/kaixin/EBBkC/src  -fopenmp -g -O3 -g -march=native -std=gnu++14 -o CMakeFiles/BBkC.dir/truss/decompose/pkt_tri_cnt_intermediate.cpp.o -c /home/kaixin/EBBkC/src/truss/decompose/pkt_tri_cnt_intermediate.cpp",
+  "file": "/home/kaixin/EBBkC/src/truss/decompose/pkt_tri_cnt_intermediate.cpp"
+}
+]

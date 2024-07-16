@@ -1,0 +1,2 @@
+/usr/bin/ar qc libgraph-pre-processing-legacy.a "CMakeFiles/graph-pre-processing-legacy.dir/truss/util/graph/graph_preprocessing.cpp.o"
+/usr/bin/ranlib libgraph-pre-processing-legacy.a
