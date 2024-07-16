@@ -1,2 +1,0 @@
-/usr/bin/ar qc libcommon-utils.a "CMakeFiles/common-utils.dir/truss/util/reordering/reorder_utils.cpp.o" "CMakeFiles/common-utils.dir/truss/util/reordering/pkc_reorder.cpp.o" "CMakeFiles/common-utils.dir/truss/util/graph/graph.cpp.o" "CMakeFiles/common-utils.dir/truss/util/log/log.cpp.o" "CMakeFiles/common-utils.dir/truss/util/md5.cpp.o" "CMakeFiles/common-utils.dir/truss/util/search/search_util.cpp.o" "CMakeFiles/common-utils.dir/truss/decompose/extern_variables.cpp.o"
-/usr/bin/ranlib libcommon-utils.a
