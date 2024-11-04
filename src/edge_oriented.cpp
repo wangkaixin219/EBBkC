@@ -1267,7 +1267,7 @@ void EBBkC_Graph_t::truss_decompose(const char *dir) {
     assert(EdgeSupport != nullptr);
 
     auto max_omp_threads = omp_get_max_threads();
-    omp_set_num_threads(max_omp_threads / 2);
+    omp_set_num_threads(max_omp_threads);
     log_info("Max Threads: %d", max_omp_threads);
 #pragma omp parallel for
     for (auto i = 0; i < max_omp_threads; i++) {
@@ -1412,7 +1412,7 @@ double EBBkC_t::list_k_clique_parallel(const char *file_name) {
 
     printf("Iterate over all cliques\n");
 
-#pragma omp parallel private(g, start, end, n_edges, i) reduction(+:N) reduction(max:runtime)
+#pragma omp parallel private(g, start, end, n_edges, i) reduction(+:N)
     {
         n_edges = 0;
         g.truss_num = G.truss_num;
@@ -1423,10 +1423,8 @@ double EBBkC_t::list_k_clique_parallel(const char *file_name) {
             g.EBBkC_plus_plus(K - 2, &N);
             n_edges++;
         }
-        double end = omp_get_wtime();
-        runtime = (end - start) * 1e3;
-        printf("Thread: %d, Runtime = %.2lf ms, handled %d edges\n", omp_get_thread_num(), runtime, n_edges);
+        printf("Thread: %d, handled %d edges\n", omp_get_thread_num(), n_edges);
     }
 
-    return runtime;
+    return (double) (omp_get_wtime() - start) * 1e3;
 }
